@@ -1,0 +1,153 @@
+<!-- Updated sectionContent.html with edit section button -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/sectionContent.css' %}">
+<style>
+    .course-container {
+        max-width: 1200px;
+        margin: auto;
+        padding: 20px;
+    }
+    
+    .content-container {
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .section-sidebar {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+    }
+
+    .sections-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    @media (max-width: 768px) {
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .sidebar-toggle {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: none;
+            z-index: 1100;
+        }
+
+        .sidebar-toggle .navbar-toggler-icon {
+            width: 30px;
+            height: 30px;
+            background-color: #007bff;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+        }
+
+        .section-sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            height: calc(100vh - 60px);
+            width: 250px;
+            background: #fff;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+        }
+
+        .section-sidebar.active {
+            transform: translateX(0);
+        }
+    }
+    
+    @media (min-width: 769px) {
+        .sidebar-toggle {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <button class="sidebar-toggle" type="button" onclick="toggleSidebar()" aria-controls="sidebar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+<div class="course-container">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="section-sidebar" id="sidebar">
+                    <div class="sidebar-header">
+                        <h3 class="sidebar-title">
+                            <i class="fas fa-book-reader me-2"></i>Course Contents
+                        </h3>
+                    </div>
+                    <div class="sections-list">
+                        {% for sec in sections %}
+                            <div class="section-item {% if sec.section_id == section.section_id %}active{% endif %}">
+                                <a href="{% url 'section_content' sec.section_id %}" class="section-link">
+                                    <span class="section-number">{{ forloop.counter }}</span>
+                                    {{ sec.section_name }}
+                                    {% if sec.section_id in user_progress.completed_sections %}
+                                        <span class="badge bg-success ms-2"><i class="fas fa-check"></i></span>
+                                    {% endif %}
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-9">
+                <div class="content-container">
+                    <div class="content-header">
+                        <h1 class="content-title">{{ section.section_name }}</h1>
+                    </div>
+                    <div class="content-body">
+                        <div class="content-text">
+                            {{ section.text_content|safe }}
+                        </div>
+                        {% if section.image_content %}
+                            <div class="content-image">
+                                <img src="{{ section.image_content }}" 
+                                     alt="Section visual content for {{ section.section_name }}"
+                                     class="img-fluid">
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="quiz-button-container text-center mt-4">
+                    <a href="{% url 'quiz' section.section_id %}" class="btn btn-primary">Take Quiz</a>
+                </div>
+                {% if user.is_superuser %}
+                <div class="edit-button-container text-center mt-3">
+                    <a href="{% url 'edit_section' section.section_id %}" class="btn btn-warning">Edit Section</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('active');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+
+
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <h1 class="text-2xl font-bold mb-4 text-gray-800">Manage Questions</h1>
+
+    <!-- Search Bar -->
+    <div class="mb-6">
+        <input
+            type="text"
+            id="search-input"
+            placeholder="Search questions..."
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300"
+        />
+    </div>
+
+    <!-- Questions Table -->
+    <div class="mt-6 overflow-x-auto bg-white rounded-lg shadow-lg">
+        <table class="min-w-full bg-white" id="questions-table">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Subject</th>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Section</th>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Question Text</th>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Correct Option</th>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for question in questions %}
+                <tr class="question-row hover:bg-gray-50 transition duration-200 ease-in-out">
+                    <td class="py-3 px-4 border-b text-gray-700"><b>{{ question.section.subject }}</b></td>
+                    <td class="py-3 px-4 border-b text-gray-700"><b>{{ question.section }}</b></td>
+                    <td class="py-3 px-4 border-b text-gray-700">{{ question.question_text | safe }}</td>
+                    <td class="py-3 px-4 border-b text-gray-700"><b>{{ question.correct_option | upper }}</b></td>
+                    <td class="py-3 px-4 border-b">
+                        <a href="#" class="text-blue-500 hover:text-blue-600 transition duration-200 ease-in-out">Edit</a>
+                        <a href="#" class="text-red-500 hover:text-red-600 ml-2 transition duration-200 ease-in-out">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- No Results Message -->
+    <div id="no-results" class="hidden mt-6 p-6 bg-gray-50 text-center text-gray-600 rounded-lg">
+        No matching questions found.
+    </div>
+</div>
+
+<!-- JavaScript for Dynamic Search -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('search-input');
+        const questionRows = document.querySelectorAll('.question-row');
+        const noResultsMessage = document.getElementById('no-results');
+
+        searchInput.addEventListener('input', function () {
+            const searchTerm = this.value.trim().toLowerCase();
+            let hasVisibleRows = false;
+
+            questionRows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                if (rowText.includes(searchTerm)) {
+                    row.classList.remove('hidden');
+                    hasVisibleRows = true;
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+
+            // Show/hide the no results message
+            if (hasVisibleRows) {
+                noResultsMessage.classList.add('hidden');
+            } else {
+                noResultsMessage.classList.remove('hidden');
+            }
+        });
+    });
+</script>
+{% endblock %}

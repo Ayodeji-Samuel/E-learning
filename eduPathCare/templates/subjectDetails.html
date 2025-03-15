@@ -1,0 +1,121 @@
+<!-- Updated subjectDetails.html with improved mobile responsiveness -->
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/subjectDetails.css' %}">
+<style>
+    .container {
+        max-width: 1200px;
+        margin: auto;
+        padding: 20px;
+    }
+
+    .subject-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .sections-container {
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+    }
+
+    .section-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .section-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .subject-header h1 {
+            font-size: 24px;
+        }
+
+        .section-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .section-actions {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="subject-header">
+        <h1 class="subject-title">{{ subject.subject_name }}</h1>
+        <p class="subject-description">{{ subject.description|safe }}</p>
+    </div>
+
+    <div class="sections-container">
+        <div class="section-header">
+            <h2 class="section-title">Course Sections</h2>
+            <span class="section-count">{{ sections|length }} sections</span>
+        </div>
+
+        {% if sections %}
+            {% for section in sections %}
+                <div class="section-item">
+                    <div class="section-info">
+                        <span class="section-number">{{ section.section_order }}</span>
+                        <a href="{% url 'section_content' section.section_id %}" class="section-name">
+                            {{ section.section_name }}
+                        </a>
+                    </div>
+                    <div class="section-actions">
+                        <a href="{% url 'section_content' section.section_id %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                        {% if user.is_superuser %}
+                            <a href="{% url 'create_quiz' section.section_id %}" class="btn btn-primary btn-sm">Create Quiz</a>
+                            <button type="button" class="btn btn-danger btn-sm" onclick="confirmDelete('{% url 'delete_section' section.section_id %}')">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-book-open fa-3x mb-3 text-muted"></i>
+                <h3 class="text-muted">No sections available</h3>
+                <p class="text-muted">Start by creating your first section</p>
+            </div>
+        {% endif %}
+
+        <div class="footer-actions text-center mt-4">
+            <a href="{% url 'subjects_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Subjects
+            </a>
+            {% if user.is_superuser %}
+                <a href="{% url 'create_section' subject.subject_id %}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Create New Section
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDelete(deleteUrl) {
+    if (confirm("Are you sure you want to delete this section? This action cannot be undone.")) {
+        window.location.href = deleteUrl;
+    }
+}
+</script>
+{% endblock %}

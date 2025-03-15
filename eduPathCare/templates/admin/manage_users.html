@@ -1,0 +1,65 @@
+<!-- templates/admin/manage_users.html -->
+
+{% extends 'base.html' %}
+
+{% comment %} {% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Manage Users</h1>
+
+    <table class="min-w-full bg-white">
+        <thead>
+            <tr>
+                <th class="py-2 px-4 border-b">Username</th>
+                <th class="py-2 px-4 border-b">Email</th>
+                <th class="py-2 px-4 border-b">Role</th>
+                <th class="py-2 px-4 border-b">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td class="py-2 px-4 border-b">{{ user.username }}</td>
+                <td class="py-2 px-4 border-b">{{ user.email }}</td>
+                <td class="py-2 px-4 border-b">{{ user.role }}</td>
+                <td class="py-2 px-4 border-b">
+                    <a href="#" class="text-blue-500">Edit</a>
+                    <a href="#" class="text-red-500 ml-2">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} {% endcomment %}
+
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8 text-gray-800">Manage Users</h1>
+    <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
+        <table class="min-w-full bg-white">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Username</th>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Email</th>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Role</th>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr class="hover:bg-gray-50 transition duration-200 ease-in-out">
+                    <td class="py-3 px-4 border-b text-gray-700">{{ user.username }}</td>
+                    <td class="py-3 px-4 border-b text-gray-700">{{ user.email }}</td>
+                    <td class="py-3 px-4 border-b text-gray-700">{{ user.role }}</td>
+                    <td class="py-3 px-4 border-b">
+                        <a href="#" class="text-blue-500 hover:text-blue-600 transition duration-200 ease-in-out">Edit</a>
+                        <a href="#" class="text-red-500 hover:text-red-600 ml-2 transition duration-200 ease-in-out">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

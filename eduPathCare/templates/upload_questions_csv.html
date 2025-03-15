@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Upload Questions CSV{% endblock %}
+
+
+{% comment %} {% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Bulk Question Upload</h2>
+            
+            {% if messages %}
+            <div class="mb-6">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} p-4 rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center transition duration-300 hover:border-blue-500">
+                    <label class="cursor-pointer">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <div class="mt-4">
+                            <span class="text-blue-600 font-medium">Click to upload</span>
+                            <span class="text-gray-500"> or drag and drop</span>
+                        </div>
+                        <input type="file" name="csv_file" accept=".csv" class="hidden" required>
+                    </label>
+                </div>
+
+                <div class="text-sm text-gray-600 mt-4">
+                    <p>CSV format requirements:</p>
+                    <ul class="list-disc pl-5 mt-2 space-y-1">
+                        <li>Required columns: section_id, question_text, option_a, option_b, option_c, option_d, correct_option, explanation_a, explanation_b, explanation_c, explanation_d</li>
+                        <li>Correct_option must be a, b, c, or d</li>
+                        <li>Section ID must exist in the system</li>
+                    </ul>
+
+                    <a href="{% static 'sample_questions.csv' %}" class="mt-4 inline-flex items-center text-blue-600 hover:text-blue-800">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Download sample CSV
+                    </a>
+                </div>
+
+                <div class="mt-6">
+                    <button type="submit" class="w-full bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors duration-300 flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                        </svg>
+                        Upload Questions
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} {% endcomment %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Bulk Question Upload</h2>
+            
+            <!-- Display messages -->
+            {% if messages %}
+            <div class="mb-6">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} p-4 rounded-lg {% if message.tags == 'error' %}bg-red-100 text-red-700{% else %}bg-green-100 text-green-700{% endif %}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Upload Form -->
+            <form method="post" enctype="multipart/form-data" class="space-y-6" id="upload-form">
+                {% csrf_token %}
+                
+                <!-- File Upload Section -->
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center transition duration-300 hover:border-blue-500">
+                    <label class="cursor-pointer">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <div class="mt-4">
+                            <span class="text-blue-600 font-medium">Click to upload</span>
+                            <span class="text-gray-500"> or drag and drop</span>
+                        </div>
+                        <input type="file" name="csv_file" accept=".csv" class="hidden" id="csv-file-input" required>
+                    </label>
+                </div>
+
+                <!-- CSV Preview Section -->
+                <div id="csv-preview" class="hidden">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">CSV Preview</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-200">
+                            <thead id="csv-preview-header" class="bg-gray-50">
+                                <!-- Header row will be populated by JavaScript -->
+                            </thead>
+                            <tbody id="csv-preview-body" class="divide-y divide-gray-200">
+                                <!-- Data rows will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2">Showing first 5 rows of the CSV file.</p>
+                </div>
+
+                <!-- CSV Format Requirements -->
+                <div class="text-sm text-gray-600 mt-4">
+                    <p>CSV format requirements:</p>
+                    <ul class="list-disc pl-5 mt-2 space-y-1">
+                        <li>Required columns: section_id, question_text, option_a, option_b, option_c, option_d, correct_option, explanation_a, explanation_b, explanation_c, explanation_d</li>
+                        <li>Correct_option must be a, b, c, or d</li>
+                        <li>Section ID must exist in the system</li>
+                    </ul>
+                    <a href="{% static 'files/sample_questions.csv' %}" class="mt-4 inline-flex items-center text-blue-600 hover:text-blue-800">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Download sample CSV
+                    </a>
+                </div>
+
+                <!-- Upload Button -->
+                <div class="mt-6">
+                    <button type="submit" class="w-full bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors duration-300 flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                        </svg>
+                        Upload Questions
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for CSV Preview -->
+<script>
+    document.getElementById('csv-file-input').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const rows = text.split('\n').slice(0, 6); // Read first 6 rows (header + 5 data rows)
+                const header = rows[0].split(',').map(col => col.trim());
+                const data = rows.slice(1).map(row => row.split(',').map(col => col.trim()));
+
+                // Populate the table header
+                const headerRow = document.getElementById('csv-preview-header');
+                headerRow.innerHTML = '<tr>' + header.map(col => `<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">${col}</th>`).join('') + '</tr>';
+
+                // Populate the table body
+                const body = document.getElementById('csv-preview-body');
+                body.innerHTML = data.map(row => `<tr class="hover:bg-gray-50">${row.map(col => `<td class="px-6 py-4 text-sm text-gray-900">${col}</td>`).join('')}</tr>`).join('');
+
+                // Show the preview section
+                document.getElementById('csv-preview').classList.remove('hidden');
+            };
+            reader.readAsText(file);
+        }
+    });
+</script>
+{% endblock %}

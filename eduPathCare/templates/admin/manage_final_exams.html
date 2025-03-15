@@ -1,0 +1,66 @@
+<!-- templates/admin/manage_final_exams.html -->
+
+{% extends 'base.html' %}
+
+{% comment %} {% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Manage Final Exams</h1>
+    <a href="{% url 'create_final_exam' %}" class="bg-blue-500 text-white px-4 py-2 rounded mb-4 inline-block">Create New Final Exam</a>
+    <table class="min-w-full bg-white">
+        <thead>
+            <tr>
+                <th class="py-2 px-4 border-b">User</th>
+                <th class="py-2 px-4 border-b">Subject</th>
+                <th class="py-2 px-4 border-b">Total Score</th>
+                <th class="py-2 px-4 border-b">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for final_exam in final_exams %}
+            <tr>
+                <td class="py-2 px-4 border-b">{{ final_exam.user.username }}</td>
+                <td class="py-2 px-4 border-b">{{ final_exam.subject.subject_name }}</td>
+                <td class="py-2 px-4 border-b">{{ final_exam.total_score }}</td>
+                <td class="py-2 px-4 border-b">
+                    <a href="{% url 'edit_final_exam' final_exam.final_exam_id %}" class="text-blue-500">Edit</a>
+                    <a href="{% url 'delete_final_exam' final_exam.final_exam_id %}" class="text-red-500 ml-2">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} {% endcomment %}
+
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8 text-gray-800">Manage Final Exams</h1>
+    <a href="{% url 'create_final_exam' %}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mb-4 inline-block shadow-lg transition duration-300 ease-in-out">Create New Final Exam</a>
+    <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
+        <table class="min-w-full bg-white">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">User</th>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Subject</th>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Total Score</th>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for final_exam in final_exams %}
+                <tr class="hover:bg-gray-50 transition duration-200 ease-in-out">
+                    <td class="py-3 px-4 border-b text-gray-700">{{ final_exam.user.username }}</td>
+                    <td class="py-3 px-4 border-b text-gray-700">{{ final_exam.subject.subject_name }}</td>
+                    <td class="py-3 px-4 border-b text-gray-700">{{ final_exam.total_score }}</td>
+                    <td class="py-3 px-4 border-b">
+                        <a href="{% url 'edit_final_exam' final_exam.final_exam_id %}" class="text-blue-500 hover:text-blue-600 transition duration-200 ease-in-out">Edit</a>
+                        <a href="{% url 'delete_final_exam' final_exam.final_exam_id %}" class="text-red-500 hover:text-red-600 ml-2 transition duration-200 ease-in-out">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

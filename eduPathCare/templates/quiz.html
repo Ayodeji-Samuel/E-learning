@@ -1,0 +1,163 @@
+ <!-- Updated quiz.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-4xl mx-auto px-4">
+    <!-- Quiz Header -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">
+            <i class="fas fa-file-alt text-blue-500 mr-2"></i>{{ section.section_name }} Quiz
+          </h1>
+          <p class="text-gray-600">Test your knowledge. Total questions: {{ form|length }}</p>
+        </div>
+        <!-- Timer -->
+        <div id="timer" class="text-xl font-bold text-red-600 bg-red-50 px-4 py-2 rounded-lg">
+          00:00
+        </div>
+      </div>
+      
+      <!-- Question Navigation -->
+      <div class="grid grid-cols-5 md:grid-cols-10 gap-2 mb-6" id="questionNav">
+        {% for field in form %}
+          <button type="button" 
+                  class="nav-btn w-full h-10 rounded bg-gray-200 text-gray-700 hover:bg-blue-200 transition-colors"
+                  data-question="{{ forloop.counter0 }}">
+            {{ forloop.counter }}
+          </button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Quiz Body -->
+    <form method="post" id="quizForm" class="bg-white rounded-lg shadow-lg p-6">
+      {% csrf_token %}
+      <div class="question-container">
+        {% for field in form %}
+          <div class="question-slide hidden" data-question="{{ forloop.counter0 }}">
+            <div class="mb-6">
+              <label class="block text-lg font-semibold text-gray-800 mb-4">
+                <i class="fas fa-question-circle text-blue-500 mr-2"></i>{{ field.label }}
+              </label>
+              <div class="space-y-3">
+                {% for choice in field %}
+                  <div class="flex items-center bg-gray-50 p-3 rounded-lg hover:bg-blue-50">
+                    {{ choice.tag }}
+                    <label class="ml-3 text-gray-700 cursor-pointer">
+                      {{ choice.choice_label }}
+                    </label>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Controls -->
+      <div class="flex justify-between items-center mt-6">
+        <button type="button" id="prevBtn" 
+                class="btn-secondary px-6 py-2 rounded-lg hidden">
+          <i class="fas fa-arrow-left mr-2"></i>Previous
+        </button>
+        <button type="button" id="nextBtn" 
+                class="btn-primary px-6 py-2 rounded-lg">
+          Next<i class="fas fa-arrow-right ml-2"></i>
+        </button>
+      </div>
+      
+      <button type="submit" id="submitBtn" 
+              class="w-full bg-green-600 text-white py-3 rounded-lg mt-6 hidden hover:bg-green-700">
+        Submit Quiz
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const questions = document.querySelectorAll('.question-slide');
+  const navButtons = document.querySelectorAll('.nav-btn');
+  let currentQuestion = 0;
+  let timeLeft = 1800; // 30 minutes in seconds
+
+  // Timer Function
+  const timerInterval = setInterval(() => {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    document.getElementById('timer').textContent = 
+      `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+      if(timeLeft <= 0) {
+        clearInterval(timerInterval);
+        // Add the remaining time to the form before submission
+        const timeInput = document.createElement('input');
+        timeInput.type = 'hidden';
+        timeInput.name = 'time_spent';
+        timeInput.value = 1800 - timeLeft;
+        document.getElementById('quizForm').appendChild(timeInput);
+        document.getElementById('quizForm').submit();
+      }
+      timeLeft--;
+    }, 1000);
+
+    // Add the remaining time to the form when manually submitting
+  document.getElementById('quizForm').addEventListener('submit', function() {
+    const timeInput = document.createElement('input');
+    timeInput.type = 'hidden';
+    timeInput.name = 'time_spent';
+    timeInput.value = 1800 - timeLeft;
+    this.appendChild(timeInput);
+  });
+
+  // Update navigation buttons
+  function updateNavButtons() {
+    navButtons.forEach((btn, index) => {
+      const isAnswered = document.querySelector(
+        `[name="${questions[index].querySelector('input').name}"]:checked`
+      );
+      btn.classList.toggle('bg-blue-500', index === currentQuestion);
+      btn.classList.toggle('text-white', index === currentQuestion);
+      btn.classList.toggle('bg-green-200', isAnswered);
+    });
+  }
+
+  // Show question
+  function showQuestion(index) {
+    questions.forEach(q => q.classList.add('hidden'));
+    questions[index].classList.remove('hidden');
+    currentQuestion = index;
+    
+    document.getElementById('prevBtn').classList.toggle('hidden', index === 0);
+    document.getElementById('nextBtn').classList.toggle('hidden', index === questions.length - 1);
+    document.getElementById('submitBtn').classList.toggle('hidden', index !== questions.length - 1);
+    
+    updateNavButtons();
+  }
+
+  // Navigation controls
+  navButtons.forEach(btn => {
+    btn.addEventListener('click', () => showQuestion(parseInt(btn.dataset.question)));
+  });
+
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    if(currentQuestion > 0) showQuestion(currentQuestion - 1);
+  });
+
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    if(currentQuestion < questions.length - 1) showQuestion(currentQuestion + 1);
+  });
+
+  // Track answer selection
+  document.querySelectorAll('input[type="radio"]').forEach(input => {
+    input.addEventListener('change', updateNavButtons);
+  });
+
+  showQuestion(0);
+});
+</script>
+{% endblock %}

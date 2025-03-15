@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Student Dashboard</h1>
+    <div class="row">
+        <!-- Overall Progress -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Overall Progress</h5>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: {{ overall_progress }}%;" aria-valuenow="{{ overall_progress }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ overall_progress|floatformat:2 }}%
+                        </div>
+                    </div>
+                    <p class="mt-2">Sections Completed: {{ total_sections_completed }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Performance -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Quiz Performance</h5>
+                    <div class="accordion" id="quizPerformanceAccordion">
+                        {% regroup quiz_performance by subject.subject_name as grouped_performances %}
+                        {% for subject, performances in grouped_performances %}
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="true" aria-controls="collapse{{ forloop.counter }}">
+                                        {{ subject }}
+                                    </button>
+                                </h2>
+                                <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse show" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#quizPerformanceAccordion">
+                                    <div class="accordion-body">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Section</th>
+                                                    <th>Percentage Score</th>
+                                                    <th>Remark</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for performance in performances %}
+                                                    <tr>
+                                                        <td>{{ performance.section.section_name }}</td>
+                                                        <td>{{ performance.percentage_score|floatformat:2 }}%</td>
+                                                        <td>
+                                                            <span class="badge {{ performance.badge_class }}">
+                                                                {{ performance.remark }}
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommended Topics -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Recommended Sections</h5>
+                    {% if recommended_sections %}
+                        <ul class="list-group">
+                            {% for section in recommended_sections %}
+                                <li class="list-group-item">
+                                    <a href="{% url 'section_content' section.section_id %}">
+                                        {{ section.subject.subject_name }} - {{ section.section_name }}
+                                    </a>
+                                    <span class="badge bg-warning">Needs Improvement</span>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No recommendations at this time. Keep up the good work!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

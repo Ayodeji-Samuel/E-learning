@@ -1,0 +1,114 @@
+<!-- templates/user_dashboard.html -->
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-6 bg-gray-50 min-h-screen">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">User Dashboard</h1>
+
+    <!-- eduPathCare Section -->
+    <div class="mb-8 bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-700">eduPathCare Performance</h2>
+
+        <!-- Overall Progress -->
+        <div class="mb-6">
+            <h3 class="text-xl font-semibold mb-2 text-gray-700">Overall Progress</h3>
+            <div class="bg-gray-200 rounded-full h-4">
+                <div class="bg-blue-500 h-4 rounded-full" style="width: {{ overall_progress }}%;"></div>
+            </div>
+            <p class="mt-2 text-gray-600">{{ overall_progress|floatformat:2 }}% Completed</p>
+        </div>
+
+        <!-- Subject Performance Table -->
+        <h3 class="text-xl font-semibold mb-2 text-gray-700">Subject Performance</h3>
+        <table class="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Subject</th>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Total Questions</th>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Percentage Score</th>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Suggest Improvement</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for performance in subject_performance %}
+                <tr class="hover:bg-gray-50 transition duration-200">
+                    <td class="py-3 px-4 border-b text-gray-600">{{ performance.subject.subject_name }}</td>
+                    <td class="py-3 px-4 border-b text-gray-600">{{ performance.total_questions }}</td>
+                    <td class="py-3 px-4 border-b text-gray-600">{{ performance.percentage_score|floatformat:2 }}%</td>
+                    <td class="py-3 px-4 border-b">
+                        {% if performance.suggest_improvement %}
+                            <span class="text-red-500 font-semibold">Yes</span>
+                        {% else %}
+                            <span class="text-green-500 font-semibold">No</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Subject Performance Chart -->
+        <div class="mt-8">
+            <h3 class="text-xl font-semibold mb-2 text-gray-700">Subject Performance Chart</h3>
+            <div class="bg-gray-100 p-4 rounded-lg">
+                <canvas id="subjectChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trivia Game Section -->
+    <div class="mb-8 bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-700">Trivia Game</h2>
+        
+        <!-- Total Coins Won -->
+        <div class="mb-6">
+            <h3 class="text-xl font-semibold mb-2 text-gray-700">Total Coins Won</h3>
+            <p class="text-2xl text-blue-600 font-bold">{{ total_coins_won }} Coins</p>
+        </div>
+
+        <!-- Withdrawal Button -->
+        <form action="{% url 'withdraw_coins' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition duration-200">
+                Withdraw Coins
+            </button>
+        </form>
+
+        <!-- Total Coins Purchased -->
+        <div class="mt-6">
+            <h3 class="text-xl font-semibold mb-2 text-gray-700">Total Coins Purchased</h3>
+            <p class="text-2xl text-green-600 font-bold">{{ total_coins_purchased }} Coins</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('subjectChart').getContext('2d');
+    const subjectChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{% for performance in subject_performance %}"{{ performance.subject.subject_name }}",{% endfor %}],
+            datasets: [{
+                label: 'Percentage Score',
+                data: [{% for performance in subject_performance %}{{ performance.percentage_score|floatformat:2 }},{% endfor %}],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

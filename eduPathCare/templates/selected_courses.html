@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+<div class="container mx-auto p-6">
+    <h1 class="text-4xl text-red-500 text-center p-3">Your Selected Courses</h1>
+
+    {% if user_subjects %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for user_subject in user_subjects %}
+                {% if user_subject.is_selected %}
+                    <div class="bg-white shadow-lg rounded-xl p-6 space-y-4 border border-gray-200">
+                        <h2 class="text-xl font-semibold text-gray-900">{{ user_subject.subject.subject_name }}</h2>
+                        <p class="text-gray-600">{{ user_subject.subject.description | safe }}</p>
+                        <p class="text-sm text-gray-500">📅 Subscription Expiry: {{ user_subject.subscription_expiry }}</p>
+
+                        {% if user_subject.subscription_expiry > current_time %}
+                            <a href="{% url 'view_selected_subject' user_subject.subject.subject_id %}" 
+                               class="block text-center bg-green-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-green-700 transition glass">
+                                View Course
+                            </a>
+                        {% else %}
+                            <p class="text-red-500 font-medium text-center">Subscription expired. Course not accessible.</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-center text-gray-500 text-lg">You have not selected any courses yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

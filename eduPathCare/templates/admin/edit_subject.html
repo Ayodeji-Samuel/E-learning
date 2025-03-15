@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Edit Subject: {{ subject.subject_name }}</h1>
+
+    <!-- Edit Subject Form -->
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <div class="mt-6">
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save Changes</button>
+            <a href="{% url 'manage_subject' %}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 ml-2">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

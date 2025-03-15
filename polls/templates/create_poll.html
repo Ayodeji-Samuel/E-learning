@@ -1,0 +1,269 @@
+{% extends "base.html" %}
+
+{% comment %} {% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-6 text-center">Create a New Poll</h1>
+        <form method="post">
+            {% csrf_token %}
+            <!-- Question Input -->
+            <div class="mb-4">
+                <label for="question" class="block text-sm font-medium text-gray-700">Poll Question</label>
+                <input type="text" name="question" id="question" required
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
+            <!-- Question Type -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Question Type</label>
+                <div class="mt-2 space-y-2">
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="question_type" value="MC" required
+                            class="form-radio h-4 w-4 text-indigo-600">
+                        <span class="ml-2">Multiple Choice</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="question_type" value="OT" required
+                            class="form-radio h-4 w-4 text-indigo-600">
+                        <span class="ml-2">Open Text</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Options for Multiple Choice -->
+            <div id="options-container" class="mb-4 hidden">
+                <label class="block text-sm font-medium text-gray-700">Options</label>
+                <div class="mt-2 space-y-2">
+                    <input type="text" name="options" placeholder="Option 1"
+                        class="option-input block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <input type="text" name="options" placeholder="Option 2"
+                        class="option-input block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <button type="button" id="add-option"
+                    class="mt-2 text-sm text-indigo-600 hover:text-indigo-500">+ Add Another Option</button>
+            </div>
+
+            <!-- Expiration Time -->
+            <div class="mb-4">
+                <label for="expiration_time" class="block text-sm font-medium text-gray-700">Expiration Time (Optional)</label>
+                <input type="datetime-local" name="expiration_time" id="expiration_time"
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button type="submit"
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    Create Poll
+                </button>
+            </div>
+        </form>
+
+        <!-- Display Poll Link -->
+        {% if poll_link %}
+            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                <p class="text-sm font-medium text-gray-700">Your poll has been created! Share this link:</p>
+                <div class="mt-2 flex items-center">
+                    <input type="text" id="poll-link" value="{{ poll_link }}" readonly
+                        class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <button onclick="copyPollLink()"
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-r-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        Copy Link
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Display All Polls in Accordion -->
+        <div class="mt-8">
+            <h2 class="text-xl font-semibold mb-4">Your Polls</h2>
+            <div class="space-y-4">
+                {% for poll in user_polls %}
+                    <div class="accordion-item bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left p-4 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            onclick="toggleAccordion(this)">
+                            <span class="font-medium">{{ poll.question }}</span>
+                            <span class="float-right">{% if poll.is_active %}Active{% else %}Inactive{% endif %}</span>
+                        </button>
+                        <div class="accordion-content hidden p-4 border-t border-gray-200">
+                            <p><strong>Question Type:</strong> {{ poll.get_question_type_display }}</p>
+                            <p><strong>Created At:</strong> {{ poll.created_at }}</p>
+                            <p><strong>Expiration Time:</strong> {{ poll.expiration_time|default:"No expiration" }}</p>
+                            <a href="{% url 'polls:poll_detail' poll.uuid %}" class="text-indigo-600 hover:text-indigo-500">View Details</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Show/hide options based on question type
+    document.querySelectorAll('input[name="question_type"]').forEach((radio) => {
+        radio.addEventListener('change', (e) => {
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.classList.toggle('hidden', e.target.value !== 'MC');
+        });
+    });
+
+    // Add more options for multiple-choice
+    document.getElementById('add-option').addEventListener('click', () => {
+        const newInput = document.createElement('input');
+        newInput.type = 'text';
+        newInput.name = 'options';
+        newInput.placeholder = 'New Option';
+        newInput.classList.add('option-input', 'block', 'w-full', 'px-3', 'py-2', 'border', 'border-gray-300', 'rounded-md', 'shadow-sm', 'focus:outline-none', 'focus:ring-indigo-500', 'focus:border-indigo-500', 'mt-2');
+        document.querySelector('#options-container').insertBefore(newInput, document.getElementById('add-option'));
+    });
+
+    // Copy poll link to clipboard
+    function copyPollLink() {
+        const pollLinkInput = document.getElementById('poll-link');
+        pollLinkInput.select();
+        document.execCommand('copy');
+        alert('Link copied to clipboard!');
+    }
+
+    // Accordion functionality
+    function toggleAccordion(button) {
+        const content = button.nextElementSibling;
+        content.classList.toggle('hidden');
+    }
+</script>
+{% endblock %} {% endcomment %}
+
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-6 text-center">Create a New Poll</h1>
+        <form method="post">
+            {% csrf_token %}
+            <!-- Question Input -->
+            <div class="mb-4">
+                <label for="question" class="block text-sm font-medium text-gray-700">Poll Question</label>
+                <input type="text" name="question" id="question" required
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
+            <!-- Question Type -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Question Type</label>
+                <div class="mt-2 space-y-2">
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="question_type" value="MC" required
+                            class="form-radio h-4 w-4 text-indigo-600">
+                        <span class="ml-2">Multiple Choice</span>
+                    </label>
+                    <label class="inline-flex items-center">
+                        <input type="radio" name="question_type" value="OT" required
+                            class="form-radio h-4 w-4 text-indigo-600">
+                        <span class="ml-2">Open Text</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Options for Multiple Choice -->
+            <div id="options-container" class="mb-4 hidden">
+                <label class="block text-sm font-medium text-gray-700">Options</label>
+                <div class="mt-2 space-y-2">
+                    <input type="text" name="options" placeholder="Option 1"
+                        class="option-input block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <input type="text" name="options" placeholder="Option 2"
+                        class="option-input block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <button type="button" id="add-option"
+                    class="mt-2 text-sm text-indigo-600 hover:text-indigo-500">+ Add Another Option</button>
+            </div>
+
+            <!-- Expiration Time -->
+            <div class="mb-4">
+                <label for="expiration_time" class="block text-sm font-medium text-gray-700">Expiration Time (Optional)</label>
+                <input type="datetime-local" name="expiration_time" id="expiration_time"
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
+            <!-- Submit Button -->
+            <div class="text-center">
+                <button type="submit"
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    Create Poll
+                </button>
+            </div>
+        </form>
+
+        <!-- Display Poll Link -->
+        {% if poll_link %}
+            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                <p class="text-sm font-medium text-gray-700">Your poll has been created! Share this link:</p>
+                <div class="mt-2 flex items-center">
+                    <input type="text" id="poll-link" value="{{ poll_link }}" readonly
+                        class="flex-1 px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <button onclick="copyPollLink()"
+                        class="px-4 py-2 bg-indigo-600 text-white rounded-r-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        Copy Link
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Display All Polls in Accordion -->
+        <div class="mt-8">
+            <h2 class="text-xl font-semibold mb-4">Your Polls</h2>
+            <div class="space-y-4">
+                {% for poll in user_polls %}
+                    <div class="accordion-item bg-white border border-gray-200 rounded-lg shadow-sm">
+                        <button class="accordion-header w-full text-left p-4 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            onclick="toggleAccordion(this)">
+                            <span class="font-medium">{{ poll.question }}</span>
+                            <span class="float-right">{% if poll.is_active %}Active{% else %}Inactive{% endif %}</span>
+                        </button>
+                        <div class="accordion-content hidden p-4 border-t border-gray-200">
+                            <p><strong>Question Type:</strong> {{ poll.get_question_type_display }}</p>
+                            <p><strong>Created At:</strong> {{ poll.created_at }}</p>
+                            <p><strong>Expiration Time:</strong> {{ poll.expiration_time|default:"No expiration" }}</p>
+                            <a href="{% url 'polls:poll_detail' poll.uuid %}" class="text-indigo-600 hover:text-indigo-500">View Details</a>
+                            <a href="{% url 'polls:poll_results' poll.uuid %}" class="text-indigo-600 hover:text-indigo-500 ml-4">View Results</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Show/hide options based on question type
+    document.querySelectorAll('input[name="question_type"]').forEach((radio) => {
+        radio.addEventListener('change', (e) => {
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.classList.toggle('hidden', e.target.value !== 'MC');
+        });
+    });
+
+    // Add more options for multiple-choice
+    document.getElementById('add-option').addEventListener('click', () => {
+        const newInput = document.createElement('input');
+        newInput.type = 'text';
+        newInput.name = 'options';
+        newInput.placeholder = 'New Option';
+        newInput.classList.add('option-input', 'block', 'w-full', 'px-3', 'py-2', 'border', 'border-gray-300', 'rounded-md', 'shadow-sm', 'focus:outline-none', 'focus:ring-indigo-500', 'focus:border-indigo-500', 'mt-2');
+        document.querySelector('#options-container').insertBefore(newInput, document.getElementById('add-option'));
+    });
+
+    // Copy poll link to clipboard
+    function copyPollLink() {
+        const pollLinkInput = document.getElementById('poll-link');
+        pollLinkInput.select();
+        document.execCommand('copy');
+        alert('Link copied to clipboard!');
+    }
+
+    // Accordion functionality
+    function toggleAccordion(button) {
+        const content = button.nextElementSibling;
+        content.classList.toggle('hidden');
+    }
+</script>
+{% endblock %}

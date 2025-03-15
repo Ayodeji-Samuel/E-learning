@@ -1,0 +1,30 @@
+<!-- templates/admin/view_user_activities.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">User Activities</h1>
+
+    <table class="min-w-full bg-white">
+        <thead>
+            <tr>
+                <th class="py-2 px-4 border-b">User</th>
+                <th class="py-2 px-4 border-b">Activity Type</th>
+                <th class="py-2 px-4 border-b">Timestamp</th>
+                <th class="py-2 px-4 border-b">Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for activity in activities %}
+            <tr>
+                <td class="py-2 px-4 border-b">{{ activity.user.username }}</td>
+                <td class="py-2 px-4 border-b">{{ activity.get_activity_type_display|safe }}</td>
+                <td class="py-2 px-4 border-b">{{ activity.timestamp }}</td>
+                <td class="py-2 px-4 border-b">{{ activity.details|default:"No details" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

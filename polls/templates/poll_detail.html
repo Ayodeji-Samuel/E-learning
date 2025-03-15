@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% comment %} {% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-6 text-center">{{ poll.question }}</h1>
+        
+        <!-- Poll Summary -->
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-2">Poll Summary</h2>
+            <p><strong>Question Type:</strong> {{ poll.get_question_type_display }}</p>
+            <p><strong>Created At:</strong> {{ poll.created_at }}</p>
+            <p><strong>Expiration Time:</strong> {{ poll.expiration_time|default:"No expiration" }}</p>
+            <p><strong>Status:</strong> {% if poll.is_active %}Active{% else %}Inactive{% endif %}</p>
+        </div>
+
+        <!-- Activate/Deactivate Toggle (Only for Creator) -->
+        {% if is_creator %}
+        <div class="mb-6">
+            <form method="post" action="{% url 'polls:toggle_poll_active' poll.uuid %}">
+                {% csrf_token %}
+                <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    {% if poll.is_active %}Deactivate Poll{% else %}Activate Poll{% endif %}
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- Response Form -->
+        <form method="post">
+            {% csrf_token %}
+            {% if poll.question_type == 'MC' %}
+                <!-- Multiple Choice Options -->
+                <div class="space-y-2">
+                    {% for option in poll.options.all %}
+                        <label class="block bg-gray-50 p-4 rounded-lg cursor-pointer hover:bg-gray-100">
+                            <input type="radio" name="option" value="{{ option.id }}" required
+                                class="form-radio h-4 w-4 text-indigo-600">
+                            <span class="ml-2">{{ option.text }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <!-- Open Text Response -->
+                <textarea name="response" required
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Enter your response..."></textarea>
+            {% endif %}
+            <div class="text-center mt-6">
+                <button type="submit"
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    Submit
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} {% endcomment %}
+
+
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-6 text-center">{{ poll.question }}</h1>
+        
+        <!-- Poll Summary -->
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-2">Poll Summary</h2>
+            <p><strong>Question Type:</strong> {{ poll.get_question_type_display }}</p>
+            <p><strong>Created At:</strong> {{ poll.created_at }}</p>
+            <p><strong>Expiration Time:</strong> {{ poll.expiration_time|default:"No expiration" }}</p>
+            <p><strong>Status:</strong> {% if poll.is_active %}Active{% else %}Inactive{% endif %}</p>
+        </div>
+
+        <!-- Activate/Deactivate Toggle (Only for Creator) -->
+        {% if is_creator %}
+        <div class="mb-6">
+            <form method="post" action="{% url 'polls:toggle_poll_active' poll.uuid %}">
+                {% csrf_token %}
+                <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    {% if poll.is_expired %}disabled{% endif %}>
+                    {% if poll.is_active %}Deactivate Poll{% else %}Activate Poll{% endif %}
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- Response Form -->
+        <form method="post">
+            {% csrf_token %}
+            {% if poll.question_type == 'MC' %}
+                <!-- Multiple Choice Options -->
+                <div class="space-y-2">
+                    {% for option in poll.options.all %}
+                        <label class="block bg-gray-50 p-4 rounded-lg cursor-pointer hover:bg-gray-100">
+                            <input type="radio" name="option" value="{{ option.id }}" required
+                                class="form-radio h-4 w-4 text-indigo-600">
+                            <span class="ml-2">{{ option.text }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <!-- Open Text Response -->
+                <textarea name="response" required
+                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    placeholder="Enter your response..."></textarea>
+            {% endif %}
+            <div class="text-center mt-6">
+                <button type="submit"
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    Submit
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

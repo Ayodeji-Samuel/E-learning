@@ -1,0 +1,71 @@
+<div class="space-y-6">
+    {% if section %}
+        <div class="pb-6 border-b border-gray-200">
+            <div class="flex items-center justify-between mb-4">
+                {% if section.is_completed %}
+                <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">✓ Completed</span>
+                {% endif %}
+            </div>
+            {% if section.image_content %}
+            <div class="my-6 rounded-lg overflow-hidden">
+                <img src="{{ section.image_content }}" alt="{{ section.section_name }}" 
+                    class="w-full h-auto object-cover max-h-96">
+            </div>
+            {% endif %}
+            <div class="prose max-w-none text-gray-700">
+                {{ section.text_content | safe }}
+            </div>
+            {% if not section.is_completed %}
+                <form action="{% url 'mark_as_completed' %}" method="post" class="mt-6">
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                    <input type="hidden" name="content_type" value="section">
+                    <input type="hidden" name="content_id" value="{{ section.section_id }}">
+                    <button type="submit" 
+                            class="inline-flex items-center px-5 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                        ✓ Mark Section as Completed
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+        <div class="mt-6">
+            <a href="{% url 'flashcards' section.section_id %}" 
+               class="inline-flex items-center px-4 py-2 border-blue-950 text-black rounded-lg hover:bg-purple-700 transition-colors font-bold">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+                Study Flashcards
+            </a>
+        </div>
+    {% endif %}
+
+    {% if subsection %}
+    <div class="pb-6 border-b border-gray-200">
+        <div class="flex items-center justify-between mb-4">
+            {% if subsection.is_completed %}
+            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">✓ Completed</span>
+            {% endif %}
+        </div>
+        {% if subsection.image_content %}
+        <div class="my-6 rounded-lg overflow-hidden">
+            <img src="{{ subsection.image_content }}" alt="{{ subsection.subsection_name }}" 
+                 class="w-full h-auto object-cover max-h-80">
+        </div>
+        {% endif %}
+        <div class="prose max-w-none text-gray-700">
+            {{ subsection.text_content | safe }}
+        </div>
+        {% if not subsection.is_completed %}
+        <form action="{% url 'mark_as_completed' %}" method="post" class="mt-6">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            <input type="hidden" name="content_type" value="subsection">
+            <input type="hidden" name="content_id" value="{{ subsection.subsection_id }}">
+            <button type="submit" 
+                    class="inline-flex items-center px-5 py-3 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                ✓ Mark Subsection as Completed
+            </button>
+        </form>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+

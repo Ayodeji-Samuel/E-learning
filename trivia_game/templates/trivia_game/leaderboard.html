@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% comment %} {% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-2xl">
+        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Leaderboard</h1>
+        <table class="w-full">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="p-3 text-left">Rank</th>
+                    <th class="p-3 text-left">User</th>
+                    <th class="p-3 text-left">Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in leaderboard %}
+                <tr class="border-b">
+                    <td class="p-3">{{ forloop.counter }}</td>
+                    <td class="p-3">{{ entry.user.username }}</td>
+                    <td class="p-3">{{ entry.score }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="mt-6 text-center">
+            <a href="{% url 'trivia_game:home' %}" class="text-blue-600 hover:underline">Play Again</a>
+        </div>
+    </div>
+</div>
+{% endblock %} {% endcomment %}
+
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-100">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-2xl">
+        <h1 class="text-3xl font-bold text-center mb-6 text-gray-800">Leaderboard</h1>
+        <table class="w-full">
+            <thead>
+                <tr class="bg-gray-100">
+                    <th class="p-3 text-left">Rank</th>
+                    <th class="p-3 text-left">User</th>
+                    <th class="p-3 text-left">Total Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in leaderboard %}
+                <tr class="border-b">
+                    <td class="p-3">{{ forloop.counter }}</td>
+                    <td class="p-3">{{ entry.user__username }}</td>
+                    <td class="p-3">{{ entry.total_score }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="mt-6 text-center">
+            <a href="{% url 'trivia_game:home' %}" class="text-blue-600 hover:underline">Play Again</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

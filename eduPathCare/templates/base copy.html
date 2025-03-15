@@ -1,0 +1,123 @@
+{% load static tailwind_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="EduConnect - Your Professional Learning Platform">
+    <title>{% block title %}AnSaSphere{% endblock %}</title>
+    
+    {% tailwind_css %}
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="navbar bg-blue-950 border-b-2 border-white-400 shadow-xl text-white rounded-b-3xl">
+        <div class="navbar-start">
+            <div class="dropdown">
+                <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
+                    </svg>
+                </div>
+                <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
+                    <li class="pr-8">
+                        <details>
+                            <summary>Subjects</summary>
+                            <ul class="p-2">
+                                {% if user.is_superuser %}
+                                    <li><a href="{% url 'create_subject' %}">Create Subject</a></li>
+                                {% endif %}
+                                <li><a href="{% url 'subjects_list' %}">List Subjects</a></li>
+                                {% if user.is_authenticated %}
+                                    <li><a href="{% url 'student_dashboard' %}">Dashboard</a></li>
+                                {% endif %}
+                            </ul>
+                        </details>
+                    </li>
+                </ul>
+            </div>
+            <a class="btn btn-ghost text-xl" href="{% url 'index' %}">AnSaSphere</a>
+        </div>
+
+        <div class="navbar-center hidden lg:flex">
+            <ul class="menu menu-horizontal px-1">
+                {% if user.is_authenticated %}
+                <li>
+                <a href="{% url 'purchase_coins' %}" class="pr-8 text-white hover:text-blue-500">
+                    Purchase Coins
+                </a>
+                </li>
+                    <li class="pr-8">
+                        <details>
+                            <summary>JAMB</summary>
+                            <ul class="p-2 text-blue-800">
+                                {% if user.is_superuser %}
+                                    <li><a href="{% url 'create_subject' %}">Create Subject</a></li>
+                                {% endif %}
+                                <li><a href="{% url 'subjects_list' %}">List Subjects</a></li>
+                                <li><a href="{% url 'student_dashboard' %}">Dashboard</a></li>
+                            </ul>
+                        </details>
+                    </li>
+
+                    <li class="pr-8">
+                        <details>
+                            <summary>TRIVIA GAME</summary>
+                            <ul class="p-2">
+                                {% if user.is_superuser %}
+                                    <li><a href="#">Create Subject</a></li>
+                                {% endif %}
+                                <li><a href="#">List Subjects</a></li>
+                                <li><a href="#">Dashboard</a></li>
+                            </ul>
+                        </details>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <div class="navbar-end">
+            {% if user.is_authenticated %}
+                <div class="p-4">
+                    <a class="btn" href="{% url 'logout' %}">Logout</a>
+                </div>
+            {% else %}
+                <div class="p-4">
+                    <a class="btn" href="{% url 'login' %}">Login</a>
+                </div>
+                <div class="p-4">
+                    <a class="btn" href="{% url 'signup' %}">SignUp</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container mx-auto p-6">
+            {% if messages %}
+                <div class="toast toast-top toast-end">
+                    {% for message in messages %}
+                        <div class="alert glass shadow-lg 
+                            {% if message.tags == 'success' %}bg-green-500 text-white{% elif message.tags == 'error' %}bg-red-500 text-white{% elif message.tags == 'warning' %}bg-yellow-500 text-black{% elif message.tags == 'info' %}bg-blue-500 text-white{% else %}bg-gray-500 text-white{% endif %}">
+                            <span>{{ message }}</span>
+                            <button onclick="this.parentElement.remove()" class="ml-auto text-white hover:text-gray-300">✖</button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <!-- Add your footer content here -->
+
+    <!-- JavaScript -->
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

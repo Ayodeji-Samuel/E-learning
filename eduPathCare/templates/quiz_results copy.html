@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto">
+    <!-- Debug: Print the results dictionary -->
+    <div class="bg-yellow-100 p-4 mb-4 rounded-lg">
+      <p>Debug: results = {{ results }}</p>
+    </div>
+
+    <!-- Quiz Results Card -->
+    <div class="bg-white rounded-lg shadow-xl overflow-hidden">
+      <!-- Header -->
+      <div class="p-6 bg-gradient-to-r {% if percentage_score >= 90 %}from-green-500 to-green-600{% else %}from-yellow-500 to-yellow-600{% endif %}">
+        <div class="flex items-center justify-center space-x-4">
+          <i class="fas {% if percentage_score >= 90 %}fa-trophy{% else %}fa-exclamation-triangle{% endif %} text-white text-3xl"></i>
+          <h1 class="text-2xl font-bold text-white">Quiz Results: {{ section.section_name }}</h1>
+        </div>
+      </div>
+
+      <!-- Performance Summary -->
+      <div class="p-6">
+        <div class="text-center mb-6">
+          <h2 class="text-xl font-semibold text-gray-800 mb-4">Your Performance</h2>
+          <div class="flex justify-center space-x-4">
+            <div class="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg">
+              <h3 class="text-lg font-bold">Score: {{ score }}/{{ total_questions }}</h3>
+            </div>
+            <div class="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg">
+              <h3 class="text-lg font-bold">{{ percentage_score }}%</h3>
+            </div>
+            <div class="bg-purple-100 text-purple-800 px-4 py-2 rounded-lg">
+              <h3 class="text-lg font-bold">Time Spent: {{ time_spent_minutes }}m {{ time_spent_seconds }}s</h3>
+            </div>
+          </div>
+        </div>
+
+        <!-- Performance Message -->
+        {% if percentage_score >= 90 %}
+          <div class="bg-green-50 text-green-800 p-4 rounded-lg mb-6 text-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            Congratulations! You've completed this section.
+          </div>
+        {% else %}
+          <div class="bg-yellow-50 text-yellow-800 p-4 rounded-lg mb-6 text-center">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            You scored less than 90%. Feel free to retake the quiz.
+          </div>
+        {% endif %}
+
+        <!-- Detailed Results -->
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">Detailed Results</h3>
+          <ul class="space-y-4">
+            {% for result in results %}
+              <li class="p-4 rounded-lg {% if result.is_correct %}bg-green-50{% else %}bg-red-50{% endif %}">
+                <div class="flex justify-between items-center mb-2">
+                  <strong class="text-gray-800">{{ result.question }}</strong>
+                  <span class="px-3 py-1 rounded-full text-sm font-semibold {% if result.is_correct %}bg-green-200 text-green-800{% else %}bg-red-200 text-red-800{% endif %}">
+                    {% if result.is_correct %}Correct{% else %}Incorrect{% endif %}
+                  </span>
+                </div>
+                <div class="text-gray-700">
+                  <p><strong>Your Answer:</strong> {{ result.user_answer|default:"Skipped" }}</p>
+                  <p><strong>Correct Answer:</strong> {{ result.correct_answer }}</p>
+                  <p><strong>Explanation:</strong> {{ result.explanation }}</p>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <!-- Back Button -->
+        <div class="text-center mt-6">
+          <a href="{% url 'sections_list_quiz' section.subject.subject_id %}" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Back to Section Quiz
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

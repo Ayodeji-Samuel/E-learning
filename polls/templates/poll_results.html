@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% comment %} {% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-6 text-center">Results for {{ poll.question }}</h1>
+        {% if poll.question_type == 'MC' %}
+            <!-- Multiple Choice Results -->
+            <div class="space-y-2">
+                {% for result in results %}
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="font-medium">{{ result.text }}:</span>
+                        <span class="ml-2">{{ result.votes }} votes</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Open Text Results -->
+            <h2 class="text-xl font-bold mt-6 mb-4">Word Cloud</h2>
+            <div class="text-center">
+                <img src="data:image/png;base64,{{ word_cloud }}" alt="Word Cloud" class="mx-auto">
+            </div>
+            <h2 class="text-xl font-bold mt-6 mb-4">Responses</h2>
+            <div class="space-y-2">
+                {% for result in results %}
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p>{{ result.response }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} {% endcomment %}
+
+
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-6 text-center">Results for {{ poll.question }}</h1>
+        {% if poll.question_type == 'MC' %}
+            <!-- Multiple Choice Results -->
+            <h2 class="text-xl font-bold mt-6 mb-4">Vote Counts</h2>
+            <div class="space-y-2">
+                {% for result in results %}
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <span class="font-medium">{{ result.text }}:</span>
+                        <span class="ml-2">{{ result.votes }} votes</span>
+                    </div>
+                {% endfor %}
+            </div>
+            <!-- Bar Chart for Multiple Choice Results -->
+            <h2 class="text-xl font-bold mt-6 mb-4">Vote Distribution</h2>
+            <div class="text-center">
+                <canvas id="voteChart" width="400" height="200"></canvas>
+            </div>
+        {% else %}
+            <!-- Open Text Results -->
+            <h2 class="text-xl font-bold mt-6 mb-4">Word Cloud</h2>
+            <div class="text-center">
+                <img src="data:image/png;base64,{{ word_cloud }}" alt="Word Cloud" class="mx-auto">
+            </div>
+            <h2 class="text-xl font-bold mt-6 mb-4">Responses</h2>
+            <div class="space-y-2">
+                {% for result in results %}
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <p>{{ result.response }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Chart.js for Bar Chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    {% if poll.question_type == 'MC' %}
+    const ctx = document.getElementById('voteChart').getContext('2d');
+    const voteChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{% for result in results %}"{{ result.text }}",{% endfor %}],
+            datasets: [{
+                label: 'Votes',
+                data: [{% for result in results %}{{ result.votes }},{% endfor %}],
+                backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                borderColor: 'rgba(79, 70, 229, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    {% endif %}
+</script>
+{% endblock %}

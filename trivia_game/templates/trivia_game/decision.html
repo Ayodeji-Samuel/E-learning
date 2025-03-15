@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-4xl mx-auto px-4">
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+      <h1 class="text-2xl font-bold text-gray-800 mb-6">Decision Time!</h1>
+      <p class="text-gray-600 mb-6">You have answered the fifth question correctly. You can take {{ coin_reward }} coins now or continue playing.</p>
+      <form method="post" action="{% url 'trivia_game:handle_decision' session_id=game_session.id %}">
+        {% csrf_token %}
+        <button type="submit" name="decision" value="take_coins" class="w-full bg-green-600 text-white py-3 rounded-lg mb-3 hover:bg-green-700">
+          Take {{ coin_reward }} Coins and End Game
+        </button>
+        <button type="submit" name="decision" value="continue" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">
+          Continue Playing
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

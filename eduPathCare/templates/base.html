@@ -1,0 +1,311 @@
+{% load static tailwind_tags %}
+
+{% comment %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="EduConnect - Your Professional Learning Platform">
+    <title>{% block title %}AnSaSphere{% endblock %}</title>
+    
+    {% tailwind_css %}
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="flex flex-col min-h-screen bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-blue-950 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo and Mobile Menu Button -->
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="{% url 'index' %}" class="flex items-center">
+                            <img src="{% static 'images/logo1.png' %}" alt="AnSaSphere" class="h-8 w-8 mr-2">
+                            <span class="text-white text-xl font-bold">AnSaSphere</span>
+                        </a>
+                    </div>
+                    <!-- Desktop Menu -->
+                    <div class="hidden lg:flex lg:items-center lg:space-x-8 ml-10">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'purchase_coins' %}" class="text-white hover:text-blue-400 text-lg font-medium transition duration-300">
+                                Buy Coins
+                            </a>
+                            <a href="{% url 'dashboard' %}" class="text-white hover:text-blue-400 text-lg font-medium transition duration-300">
+                                Dashboard
+                            </a>
+                            {% if user.is_superuser %}
+                                <a href="{% url 'admin_dashboard' %}" class="text-white hover:text-blue-400 text-lg font-medium transition duration-300">
+                                    Admin
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Desktop Auth Links -->
+                <div class="flex items-center">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'logout' %}" class="text-white hover:text-blue-400 text-lg font-medium px-4 py-2 rounded-lg transition duration-300">
+                            Logout
+                        </a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="text-white hover:text-blue-400 text-lg font-medium px-4 py-2 rounded-lg transition duration-300">
+                            Login
+                        </a>
+                        <a href="{% url 'signup' %}" class="text-white hover:text-blue-400 text-lg font-medium px-4 py-2 rounded-lg transition duration-300">
+                            Sign Up
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Toast Notifications -->
+        {% if messages %}
+            <div class="fixed top-4 right-4 z-50 space-y-4">
+                {% for message in messages %}
+                    <div class="flex items-center p-4 rounded-lg shadow-lg 
+                        {% if message.tags == 'success' %}bg-green-500 text-white
+                        {% elif message.tags == 'error' %}bg-red-500 text-white
+                        {% elif message.tags == 'warning' %}bg-yellow-500 text-black
+                        {% elif message.tags == 'info' %}bg-blue-500 text-white
+                        {% else %}bg-gray-500 text-white{% endif %}">
+                        <span>{{ message }}</span>
+                        <button onclick="this.parentElement.remove()" class="ml-4 text-white hover:text-gray-300">✖</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Page Content -->
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-blue-950 text-white mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-sm">&copy; 2023 AnSaSphere. All rights reserved.</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-white hover:text-blue-400 transition duration-300">Privacy Policy</a>
+                    <a href="#" class="text-white hover:text-blue-400 transition duration-300">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bottom Navigation (Mobile Only) -->
+    <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200">
+        <div class="flex justify-around items-center p-2">
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-500 transition duration-300 p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    <span class="text-xs mt-1">Dashboard</span>
+                </a>
+                <a href="{% url 'purchase_coins' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-500 transition duration-300 p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="text-xs mt-1">Buy Coins</span>
+                </a>
+                {% if user.is_superuser %}
+                    <a href="{% url 'admin_dashboard' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-500 transition duration-300 p-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span class="text-xs mt-1">Admin</span>
+                    </a>
+                {% endif %}
+                <a href="{% url 'logout' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-500 transition duration-300 p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    <span class="text-xs mt-1">Logout</span>
+                </a>
+            {% else %}
+                <a href="{% url 'login' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-500 transition duration-300 p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                    </svg>
+                    <span class="text-xs mt-1">Login</span>
+                </a>
+                <a href="{% url 'signup' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-500 transition duration-300 p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                    </svg>
+                    <span class="text-xs mt-1">Sign Up</span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    {% block extra_js %}{% endblock %}
+</body>
+</html> {% endcomment %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="EduConnect - Your Professional Learning Platform">
+    <title>{% block title %}AnSaSphere{% endblock %}</title>
+    
+    {% tailwind_css %}
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="flex flex-col min-h-screen bg-gray-100">
+    <!-- Navigation -->
+    <nav class="bg-blue-950 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <!-- Logo and Mobile Menu Button -->
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <a href="{% url 'index' %}" class="flex items-center">
+                            <!-- Desktop Logo -->
+                            <img src="{% static 'images/logod.png' %}" alt="AnSaSphere" class="h-10 w-25 mr-2 hidden lg:block">
+                            <!-- Mobile Logo -->
+                            <img src="{% static 'images/logom.png' %}" alt="AnSaSphere" class="h-8 w-15 mr-2 block lg:hidden">
+                            {% comment %} <span class="text-white text-xl font-bold">AnSaSphere</span> {% endcomment %}
+                        </a>
+                    </div>
+                    <!-- Desktop Menu -->
+                    <div class="hidden lg:flex lg:items-center lg:space-x-8 ml-10">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'purchase_coins' %}" class="text-white hover:text-blue-400 text-lg font-medium transition duration-300">
+                                Buy Coins
+                            </a>
+                            <a href="{% url 'dashboard' %}" class="text-white hover:text-blue-400 text-lg font-medium transition duration-300">
+                                Dashboard
+                            </a>
+                            {% if user.is_superuser %}
+                                <a href="{% url 'admin_dashboard' %}" class="text-white hover:text-blue-400 text-lg font-medium transition duration-300">
+                                    Admin
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Desktop Auth Links -->
+                <div class="hidden lg:flex lg:items-center lg:space-x-8 ml-10">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'logout' %}" class="text-white hover:text-blue-400 text-lg font-medium px-4 py-2 rounded-lg transition duration-300">
+                            Logout
+                        </a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="text-white hover:text-blue-400 text-lg font-medium px-4 py-2 rounded-lg transition duration-300">
+                            Login
+                        </a>
+                        <a href="{% url 'signup' %}" class="text-white hover:text-blue-400 text-lg font-medium px-4 py-2 rounded-lg transition duration-300">
+                            Sign Up
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Toast Notifications -->
+        {% if messages %}
+            <div class="fixed top-4 right-4 z-50 space-y-4">
+                {% for message in messages %}
+                    <div class="flex items-center p-4 rounded-lg shadow-lg 
+                        {% if message.tags == 'success' %}bg-green-500 text-white
+                        {% elif message.tags == 'error' %}bg-red-500 text-white
+                        {% elif message.tags == 'warning' %}bg-yellow-500 text-black
+                        {% elif message.tags == 'info' %}bg-blue-500 text-white
+                        {% else %}bg-gray-500 text-white{% endif %}">
+                        <span>{{ message }}</span>
+                        <button onclick="this.parentElement.remove()" class="ml-4 text-white hover:text-gray-300">✖</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Page Content -->
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-blue-950 text-white mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-sm">&copy; 2023 AnSaSphere. All rights reserved.</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-white hover:text-blue-400 transition duration-300">Privacy Policy</a>
+                    <a href="#" class="text-white hover:text-blue-400 transition duration-300">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bottom Navigation (Mobile Only) -->
+    <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200">
+        <div class="flex justify-around items-center p-2">
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-500 transition duration-300 p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    <span class="text-xs mt-1">Dashboard</span>
+                </a>
+                <a href="{% url 'purchase_coins' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-500 transition duration-300 p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="text-xs mt-1">Buy Coins</span>
+                </a>
+                {% if user.is_superuser %}
+                    <a href="{% url 'admin_dashboard' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-500 transition duration-300 p-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span class="text-xs mt-1">Admin</span>
+                    </a>
+                {% endif %}
+                <a href="{% url 'logout' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-500 transition duration-300 p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    <span class="text-xs mt-1">Logout</span>
+                </a>
+            {% else %}
+                <a href="{% url 'login' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-500 transition duration-300 p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                    </svg>
+                    <span class="text-xs mt-1">Login</span>
+                </a>
+                <a href="{% url 'signup' %}" class="flex flex-col items-center text-gray-700 hover:text-blue-500 transition duration-300 p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                    </svg>
+                    <span class="text-xs mt-1">Sign Up</span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

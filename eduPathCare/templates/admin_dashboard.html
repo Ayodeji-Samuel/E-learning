@@ -1,0 +1,153 @@
+<!-- templates/admin_dashboard.html -->
+
+{% extends 'base.html' %}
+
+
+
+
+{% block content %}
+<div class="min-h-screen bg-gray-100">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <h1 class="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Dashboard Cards Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Manage Users Card -->
+            <a href="{% url 'manage_users' %}" class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="mt-4 text-lg font-semibold text-gray-900">Manage Users</h2>
+                    <p class="mt-2 text-sm text-gray-600">View, edit, and manage user accounts.</p>
+                </div>
+            </a>
+
+            <!-- Manage Subjects Card -->
+            <a href="{% url 'manage_subject' %}" class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center justify-center w-12 h-12 bg-green-100 rounded-full">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <h2 class="mt-4 text-lg font-semibold text-gray-900">Manage Subjects</h2>
+                    <p class="mt-2 text-sm text-gray-600">Add, edit, and manage subjects.</p>
+                </div>
+            </a>
+
+            <!-- Manage Questions Card -->
+            <a href="{% url 'manage_questions' %}" class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center justify-center w-12 h-12 bg-purple-100 rounded-full">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="mt-4 text-lg font-semibold text-gray-900">Manage Questions</h2>
+                    <p class="mt-2 text-sm text-gray-600">Add, edit, and manage questions.</p>
+                </div>
+            </a>
+
+            <!-- Manage Quizzes Card -->
+            <a href="{% url 'manage_quizzes' %}" class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center justify-center w-12 h-12 bg-yellow-100 rounded-full">
+                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="mt-4 text-lg font-semibold text-gray-900">Manage Quizzes</h2>
+                    <p class="mt-2 text-sm text-gray-600">Create and manage quizzes.</p>
+                </div>
+            </a>
+
+            <!-- Manage Final Exams Card -->
+            <a href="{% url 'manage_final_exams' %}" class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center justify-center w-12 h-12 bg-red-100 rounded-full">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="mt-4 text-lg font-semibold text-gray-900">Manage Final Exams</h2>
+                    <p class="mt-2 text-sm text-gray-600">Create and manage final exams.</p>
+                </div>
+            </a>
+
+            <!-- Manage Categories Card -->
+            <a href="{% url 'manage_categories' %}" class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center justify-center w-12 h-12 bg-indigo-100 rounded-full">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+                        </svg>
+                    </div>
+                    <h2 class="mt-4 text-lg font-semibold text-gray-900">Manage Categories</h2>
+                    <p class="mt-2 text-sm text-gray-600">Add, edit, and manage categories.</p>
+                </div>
+            </a>
+
+            <!-- Manage Difficulty Levels Card -->
+            <a href="{% url 'manage_difficulty_levels' %}" class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center justify-center w-12 h-12 bg-pink-100 rounded-full">
+                        <svg class="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="mt-4 text-lg font-semibold text-gray-900">Manage Difficulty Levels</h2>
+                    <p class="mt-2 text-sm text-gray-600">Set and manage difficulty levels.</p>
+                </div>
+            </a>
+
+            <!-- Manage Coin Rewards Card -->
+            <a href="{% url 'manage_coin_rewards' %}" class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center justify-center w-12 h-12 bg-teal-100 rounded-full">
+                        <svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="mt-4 text-lg font-semibold text-gray-900">Manage Coin Rewards</h2>
+                    <p class="mt-2 text-sm text-gray-600">Set and manage coin rewards.</p>
+                </div>
+            </a>
+
+
+            <a href="{% url 'view_user_activities' %}" class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center justify-center w-12 h-12 bg-teal-100 rounded-full">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="mt-4 text-lg font-semibold text-gray-900">View User Activities</h2>
+                    <p class="mt-2 text-sm text-gray-600">See User Activities.</p>
+                </div>
+            </a>
+
+            <a href="{% url 'upload_questions_csv' %}" class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                <div class="p-6">
+                    <div class="flex items-center justify-center w-12 h-12 bg-orange-100 rounded-full">
+                        <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                        </svg>
+                    </div>
+                    <h2 class="mt-4 text-lg font-semibold text-gray-900">Bulk Upload Questions</h2>
+                    <p class="mt-2 text-sm text-gray-600">Upload CSV files for mass question creation</p>
+                </div>
+            </a>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

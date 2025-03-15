@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl w-full space-y-8">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                Purchase Coins
+            </h2>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                Choose a coin package to subscribe to subjects.
+            </p>
+        </div>
+        <form class="mt-8 space-y-6" method="post">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {% for coins, price in coin_packages.items %}
+                    <div class="bg-white shadow-lg rounded-xl p-6 space-y-4 text-center hover:shadow-xl transition-shadow duration-300">
+                        <!-- Coin Image and Value -->
+                        <div class="flex items-center justify-center space-x-2">
+                            <img src="{% static 'images/coins.png' %}" alt="Coin Icon" class="w-10 h-10"> <!-- Replace with your coin image URL -->
+                            <h3 class="text-xl font-semibold text-gray-800">{{ coins }} Coins</h3>
+                        </div>
+                        
+                        <!-- Price -->
+                        <p class="text-gray-600 text-lg">₦{{ price }}</p>
+
+                        <!-- Buy Now Button -->
+                        <button 
+                            type="submit" 
+                            name="selected_coins" 
+                            value="{{ coins }}"
+                            class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300 glass">
+                            Buy Now
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

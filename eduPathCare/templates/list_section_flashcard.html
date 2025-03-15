@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Flashcards for {{ subject.subject_name }}</h1>
+            <p class="text-lg text-gray-600">
+                Select a section to start practicing with flashcards.
+            </p>
+        </div>
+
+        <!-- Sections List -->
+        <div class="space-y-6">
+            {% for section in sections %}
+            <a href="{% url 'flashcards' section.section_id %}" 
+               class="group block p-6 bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-900 mb-2">{{ section.section_name }}</h2>
+                        <p class="text-gray-600">{{ section.flashcards.count }} flashcards available</p>
+                    </div>
+                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center transform group-hover:rotate-12 transition-transform">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                        </svg>
+                    </div>
+                </div>
+            </a>
+            {% empty %}
+            <div class="text-center py-8">
+                <p class="text-gray-600">No sections with flashcards available yet.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Back Button -->
+        <div class="mt-12 text-center">
+            <a href="{% url 'view_selected_subject' subject.subject_id %}" 
+               class="inline-flex items-center px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to Subject
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

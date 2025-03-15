@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-8">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-6 text-center">Your Polls</h1>
+        <div class="space-y-4">
+            {% for poll in user_polls %}
+                <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+                    <h2 class="text-lg font-semibold">{{ poll.question }}</h2>
+                    <p><strong>Type:</strong> {{ poll.get_question_type_display }}</p>
+                    <p><strong>Created At:</strong> {{ poll.created_at }}</p>
+                    <p><strong>Status:</strong> {% if poll.is_active %}Active{% else %}Inactive{% endif %}</p>
+                    <a href="{% url 'polls:poll_detail' poll.uuid %}" class="text-indigo-600 hover:text-indigo-500">View Details</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

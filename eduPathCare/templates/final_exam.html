@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% comment %} {% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold mb-6">🎓 Final Exam - {{ subject.subject_name }}</h1>
+
+    <div class="bg-white shadow-lg rounded-lg p-6">
+        {% if quizzes %}
+            <ul class="space-y-4">
+                {% for quiz in quizzes %}
+                    <li class="p-4 bg-gray-100 rounded-md shadow-sm">
+                        <h3 class="text-lg font-semibold">{{ quiz.section.section_name }}</h3>
+                        <p class="text-gray-600">Score: {{ quiz.total_score }} / {{ quiz.section.question_set.count }}</p>
+                        <p class="text-gray-600">Attempts: {{ quiz.attempts_count }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-500">No quizzes available for this subject.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} {% endcomment %}
+
+
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-4xl mx-auto px-4">
+    <!-- Final Exam Header -->
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">
+            <i class="fas fa-file-alt text-blue-500 mr-2"></i>{{ subject.subject_name }} Final Exam
+          </h1>
+          <p class="text-gray-600">Test your knowledge. Total questions: {{ question_data|length }}</p>
+        </div>
+        <!-- Timer -->
+        <div id="timer" class="text-xl font-bold text-red-600 bg-red-50 px-4 py-2 rounded-lg">
+          00:00
+        </div>
+      </div>
+      
+      <!-- Question Navigation -->
+      <div class="grid grid-cols-5 md:grid-cols-10 gap-2 mb-6" id="questionNav">
+        {% for question in question_data %}
+          <button type="button" 
+                  class="nav-btn w-full h-10 rounded bg-gray-200 text-gray-700 hover:bg-blue-200 transition-colors"
+                  data-question="{{ forloop.counter0 }}">
+            {{ forloop.counter }}
+          </button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Final Exam Body -->
+    <form method="post" id="finalExamForm" class="bg-white rounded-lg shadow-lg p-6">
+      {% csrf_token %}
+      <div class="question-container">
+        {% for question in question_data %}
+          <div class="question-slide hidden" data-question="{{ forloop.counter0 }}">
+            <div class="mb-6">
+              <label class="block text-lg font-semibold text-gray-800 mb-4">
+                <i class="fas fa-question-circle text-blue-500 mr-2"></i>{{ question.question_text|safe }}
+              </label>
+              <div class="space-y-3">
+                {% for option in question.options %}
+                  <div class="flex items-center bg-gray-50 p-3 rounded-lg hover:bg-blue-50">
+                    <input type="radio" name="question_{{ question.question_id }}" value="{{ option.value }}" id="question_{{ question.question_id }}_{{ option.value }}">
+                    <label class="ml-3 text-gray-700 cursor-pointer" for="question_{{ question.question_id }}_{{ option.value }}">
+                      {{ option.text }}
+                    </label>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Controls -->
+      <div class="flex justify-between items-center mt-6">
+        <button type="button" id="prevBtn" 
+                class="btn-secondary px-6 py-2 rounded-lg hidden">
+          <i class="fas fa-arrow-left mr-2"></i>Previous
+        </button>
+        <button type="button" id="nextBtn" 
+                class="btn-primary px-6 py-2 rounded-lg">
+          Next<i class="fas fa-arrow-right ml-2"></i>
+        </button>
+      </div>
+      
+      <button type="submit" id="submitBtn" 
+              class="w-full bg-green-600 text-white py-3 rounded-lg mt-6 hidden hover:bg-green-700">
+        Submit Final Exam
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const questions = document.querySelectorAll('.question-slide');
+  const navButtons = document.querySelectorAll('.nav-btn');
+  let currentQuestion = 0;
+  let timeLeft = 1800; // 30 minutes in seconds
+
+  // Timer Function
+  const timerInterval = setInterval(() => {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    document.getElementById('timer').textContent = 
+      `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    if(timeLeft <= 0) {
+      clearInterval(timerInterval);
+      // Add the remaining time to the form before submission
+      const timeInput = document.createElement('input');
+      timeInput.type = 'hidden';
+      timeInput.name = 'time_spent';
+      timeInput.value = 1800 - timeLeft;
+      document.getElementById('finalExamForm').appendChild(timeInput);
+      document.getElementById('finalExamForm').submit();
+    }
+    timeLeft--;
+  }, 1000);
+
+  // Add the remaining time to the form when manually submitting
+  document.getElementById('finalExamForm').addEventListener('submit', function() {
+    const timeInput = document.createElement('input');
+    timeInput.type = 'hidden';
+    timeInput.name = 'time_spent';
+    timeInput.value = 1800 - timeLeft;
+    this.appendChild(timeInput);
+  });
+
+  // Show question
+  function showQuestion(index) {
+    questions.forEach(q => q.classList.add('hidden'));
+    questions[index].classList.remove('hidden');
+    currentQuestion = index;
+    
+    document.getElementById('prevBtn').classList.toggle('hidden', index === 0);
+    document.getElementById('nextBtn').classList.toggle('hidden', index === questions.length - 1);
+    document.getElementById('submitBtn').classList.toggle('hidden', index !== questions.length - 1);
+  }
+
+  // Navigation controls
+  navButtons.forEach(btn => {
+    btn.addEventListener('click', () => showQuestion(parseInt(btn.dataset.question)));
+  });
+
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    if(currentQuestion > 0) showQuestion(currentQuestion - 1);
+  });
+
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    if(currentQuestion < questions.length - 1) showQuestion(currentQuestion + 1);
+  });
+
+  showQuestion(0);
+});
+</script>
+{% endblock %}

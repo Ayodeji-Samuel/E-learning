@@ -1,0 +1,122 @@
+<!-- templates/admin/manage_subsections.html -->
+
+{% extends 'base.html' %}
+
+{% comment %} {% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Manage Subsections</h1>
+    <a href="{% url 'create_subsection' %}" class="bg-blue-500 text-white px-4 py-2 rounded mb-4 inline-block">Create New Subsection</a>
+    <table class="min-w-full bg-white">
+        <thead>
+            <tr>
+                <th class="py-2 px-4 border-b">Subsection Name</th>
+                <th class="py-2 px-4 border-b">Subsection Order</th>
+                <th class="py-2 px-4 border-b">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for subsection in subsections %}
+            <tr>
+                <td class="py-2 px-4 border-b">{{ subsection.subsection_name }}</td>
+                <td class="py-2 px-4 border-b">{{ subsection.subsection_order }}</td>
+                <td class="py-2 px-4 border-b">
+                    <a href="{% url 'edit_subsection' subsection.subsection_id %}" class="text-blue-500">Edit</a>
+                    <a href="{% url 'delete_subsection' subsection.subsection_id %}" class="text-red-500 ml-2">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} {% endcomment %}
+
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Manage Subsections for {{ section.section_name }}</h1>
+
+    <!-- Create New Subsection Button -->
+    <div class="mb-8">
+        <a href="{% url 'create_subsection' section.section_id %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Create New Subsection</a>
+    </div>
+
+    <!-- Responsive Table -->
+    <div class="overflow-x-auto bg-white shadow-md rounded-lg">
+        <table class="min-w-full">
+            <!-- Table Header -->
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subsection Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+            </thead>
+            <!-- Table Body -->
+            <tbody class="divide-y divide-gray-200">
+                {% for subsection in subsections %}
+                    <tr class="hover:bg-gray-50 transition duration-200">
+                        <!-- Subsection Name -->
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ subsection.subsection_name }}</div>
+                        </td>
+                        <!-- Subsection Order -->
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-600">{{ subsection.subsection_order }}</div>
+                        </td>
+                        <!-- Actions -->
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center space-x-4">
+                                <!-- Edit Subsection Icon -->
+                                <a href="{% url 'edit_subsection' subsection.subsection_id %}" class="text-yellow-500 hover:text-yellow-700" title="Edit Subsection">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                </a>
+                                <!-- Delete Subsection Icon with Modal Trigger -->
+                                <button onclick="openDeleteModal('{{ subsection.subsection_id }}')" class="text-red-500 hover:text-red-700" title="Delete Subsection">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3" class="px-6 py-4 text-center text-gray-600">No subsections available.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white rounded-lg p-6 w-96">
+        <h2 class="text-xl font-bold mb-4">Confirm Deletion</h2>
+        <p class="text-gray-600 mb-6">Are you sure you want to delete this subsection? This action cannot be undone.</p>
+        <div class="flex justify-end space-x-4">
+            <button onclick="closeDeleteModal()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Cancel</button>
+            <a id="deleteConfirmLink" href="#" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Delete</a>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for Modal -->
+<script>
+    // Function to open the delete confirmation modal
+    function openDeleteModal(subsectionId) {
+        // Set the delete link's href to the correct URL
+        document.getElementById('deleteConfirmLink').href = "{% url 'delete_subsection' 0 %}".replace("0", subsectionId);
+        // Show the modal
+        document.getElementById('deleteModal').classList.remove('hidden');
+    }
+
+    // Function to close the delete confirmation modal
+    function closeDeleteModal() {
+        // Hide the modal
+        document.getElementById('deleteModal').classList.add('hidden');
+    }
+</script>
+{% endblock %}

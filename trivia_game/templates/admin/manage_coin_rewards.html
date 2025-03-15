@@ -1,0 +1,31 @@
+<!-- templates/admin/manage_coin_rewards.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Manage Coin Rewards</h1>
+    <a href="{% url 'create_coin_reward' %}" class="bg-blue-500 text-white px-4 py-2 rounded mb-4 inline-block">Create New Coin Reward</a>
+    <table class="min-w-full bg-white">
+        <thead>
+            <tr>
+                <th class="py-2 px-4 border-b">Difficulty</th>
+                <th class="py-2 px-4 border-b">Rewards</th>
+                <th class="py-2 px-4 border-b">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for coin_reward in coin_rewards %}
+            <tr>
+                <td class="py-2 px-4 border-b">{{ coin_reward.difficulty.difficulty }}</td>
+                <td class="py-2 px-4 border-b">{{ coin_reward.rewards }}</td>
+                <td class="py-2 px-4 border-b">
+                    <a href="{% url 'edit_coin_reward' coin_reward.id %}" class="text-blue-500">Edit</a>
+                    <a href="{% url 'delete_coin_reward' coin_reward.id %}" class="text-red-500 ml-2">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

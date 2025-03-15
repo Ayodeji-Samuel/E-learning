@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Ladderboard</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Rank</th>
+            <th>Student</th>
+            <th>Total Points</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student_point in student_points %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ student_point.student.get_full_name }}</td>
+            <td>{{ student_point.total_points }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

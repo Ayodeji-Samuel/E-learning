@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 flex">
+    <!-- Sidebar (2 Columns) -->
+    <div class="w-1/4 bg-gray-100 p-4 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-4">📝 Quiz Sections</h2>
+        <ul class="space-y-2">
+            {% for section in sections %}
+                <li>
+                    <a href="{% url 'take_quiz' subject_id=subject.subject_id %}" class="w-full text-left px-3 py-2 bg-blue-100 hover:bg-blue-200 rounded-md font-medium">
+                        {{ section.section_name }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Quiz Display Area (8 Columns) -->
+    <div class="w-3/4 p-6 bg-white shadow-lg rounded-lg ml-4">
+        <h2 class="text-2xl font-semibold" id="quiz-title">{{ section.section_name }}</h2>
+        <p id="timer">Time Left: 10:00</p>
+        <div id="quiz-area" class="mt-4 text-gray-700">
+            <form method="post" action="{% url 'submit_quiz' %}">
+                {% csrf_token %}
+                {% for question in questions %}
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold">Question {{ forloop.counter }}</h3>
+                        <p class="mb-2">{{ question.question_text }}</p>
+                        <div class="space-y-2">
+                            <label class="block">
+                                <input type="radio" name="question_{{ question.question_id }}" value="a" required>
+                                {{ question.option_a }}
+                            </label>
+                            <label class="block">
+                                <input type="radio" name="question_{{ question.question_id }}" value="b" required>
+                                {{ question.option_b }}
+                            </label>
+                            <label class="block">
+                                <input type="radio" name="question_{{ question.question_id }}" value="c" required>
+                                {{ question.option_c }}
+                            </label>
+                            <label class="block">
+                                <input type="radio" name="question_{{ question.question_id }}" value="d" required>
+                                {{ question.option_d }}
+                            </label>
+                        </div>
+                    </div>
+                {% endfor %}
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Submit Quiz</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

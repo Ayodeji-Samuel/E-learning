@@ -1,0 +1,31 @@
+<!-- templates/admin/manage_difficulty_levels.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Manage Difficulty Levels</h1>
+    <a href="{% url 'create_difficulty_level' %}" class="bg-blue-500 text-white px-4 py-2 rounded mb-4 inline-block">Create New Difficulty Level</a>
+    <table class="min-w-full bg-white">
+        <thead>
+            <tr>
+                <th class="py-2 px-4 border-b">Difficulty</th>
+                <th class="py-2 px-4 border-b">Price</th>
+                <th class="py-2 px-4 border-b">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for difficulty_level in difficulty_levels %}
+            <tr>
+                <td class="py-2 px-4 border-b">{{ difficulty_level.difficulty }}</td>
+                <td class="py-2 px-4 border-b">{{ difficulty_level.price }}</td>
+                <td class="py-2 px-4 border-b">
+                    <a href="{% url 'edit_difficulty_level' difficulty_level.id %}" class="text-blue-500">Edit</a>
+                    <a href="{% url 'delete_difficulty_level' difficulty_level.id %}" class="text-red-500 ml-2">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

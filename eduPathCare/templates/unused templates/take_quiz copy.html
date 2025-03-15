@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+<div class="container mx-auto px-4 py-8 flex">
+    <!-- Sidebar (2 Columns) -->
+    <div class="w-1/4 bg-gray-100 p-4 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-4">📝 Quiz Sections</h2>
+        <ul class="space-y-2">
+            {% for section in sections %}
+                <li>
+                    <button onclick="loadQuiz('{{ section.section_id }}')" class="w-full text-left px-3 py-2 bg-blue-100 hover:bg-blue-200 rounded-md font-medium">
+                        {{ section.section_name }}
+                    </button>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- Quiz Display Area (8 Columns) -->
+    <div class="w-3/4 p-6 bg-white shadow-lg rounded-lg ml-4">
+        <h2 class="text-2xl font-semibold" id="quiz-title">Select a section to view quizzes</h2>
+        <div id="quiz-area" class="mt-4 text-gray-700">
+            <!-- Quiz content will be dynamically loaded here -->
+        </div>
+        <div id="quiz-summary" class="mt-4 hidden">
+            <h3 class="text-xl font-semibold">Quiz Summary</h3>
+            <div id="summary-results"></div>
+            <p id="total-score" class="font-bold"></p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentQuestionIndex = 0;
+    let questions = [];
+    let timer;
+    const quizDuration = 600; // 10 minutes in seconds
+
+    function loadQuiz(id) {
+        fetch(`/quiz/section/${id}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('quiz-area').innerHTML = data.content;
+                document.getElementById('quiz-title').innerText = 'Quiz Content';
+                questions = JSON.parse(data.questions); // Parse questions from the backend
+                startTimer();
+                showQuestion(currentQuestionIndex);
+                createNavigationButtons();
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function startTimer() {
+        let timeLeft = quizDuration;
+        timer = setInterval(() => {
+            timeLeft--;
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                submitQuiz();
+            }
+            document.getElementById('timer').innerText = `Time Left: ${Math.floor(timeLeft / 60)}:${timeLeft % 60}`;
+        }, 1000);
+    }
+
+    function showQuestion(index) {
+        const question = questions[index];
+        const quizArea = document.getElementById('quiz-area');
+        quizArea.innerHTML = `
+            <div>
+                <h3>Question ${index + 1}</h3>
+                <p>${question.question_text}</p>
+                <form id="quiz-form">
+                    <label><input type="radio" name="answer" value="a"> ${question.option_a}</label><br>
+                    <label><input type="radio" name="answer" value="b"> ${question.option_b}</label><br>
+                    <label><input type="radio" name="answer" value="c"> ${question.option_c}</label><br>
+                    <label><input type="radio" name="answer" value="d"> ${question.option_d}</label><br>
+                </form>
+                <button onclick="submitQuiz()" class="bg-blue-500 text-white px-4 py-2 rounded-md">Submit Quiz</button>
+            </div>
+        `;
+    }
+
+    function createNavigationButtons() {
+        const navButtons = document.createElement('div');
+        navButtons.id = 'navigation-buttons';
+        for (let i = 0; i < questions.length; i++) {
+            const button = document.createElement('button');
+            button.innerText = i + 1;
+            button.onclick = () => navigateToQuestion(i);
+            navButtons.appendChild(button);
+        }
+        document.getElementById('quiz-area').appendChild(navButtons);
+    }
+
+    function navigateToQuestion(index) {
+        currentQuestionIndex = index;
+        showQuestion(index);
+    }
+
+    function submitQuiz() {
+        clearInterval(timer);
+        const userAnswers = [];
+        for (let i = 0; i < questions.length; i++) {
+            const answer = document.querySelector(`input[name="answer"]:checked`)?.value;
+            userAnswers.push({ questionId: questions[i].question_id, answer });
+        }
+
+        fetch('/submit-quiz/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({ answers: userAnswers, sectionId: questions[0].section_id }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('quiz-summary').classList.remove('hidden');
+                document.getElementById('summary-results').innerHTML = data.summary;
+                document.getElementById('total-score').innerText = `Total Score: ${data.score}%`;
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>
+
+{% endblock %}

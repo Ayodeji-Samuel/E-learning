@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Page Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Explore Our JAMB Subjects</h1>
+            <p class="text-lg text-gray-600">Discover a world of knowledge through our carefully curated subject collection</p>
+        </div>
+
+        <!-- Subjects Grid -->
+        {% if subjects %}
+        <form method="post" action="{% url 'select_subjects' %}">
+            {% csrf_token %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {% for subject in subjects %}
+                <div class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 overflow-hidden">
+                    <div class="p-6 space-y-4">
+                        <!-- Subject Name -->
+                        <h2 class="text-xl font-bold text-gray-900 text-center">{{ subject.subject_name }}</h2>
+                        
+                        <!-- Subject Description -->
+                        {% if subject.description %}
+                        <p class="text-sm text-gray-600 text-center">{{ subject.description|truncatechars:80|safe }}</p>
+                        {% endif %}
+                        
+                        <!-- Selection Checkbox -->
+                        <div class="flex justify-center items-center">
+                            {% comment %} <p class="text-lg font-bold text-green-600">Price: {{ subject.price }} coins</p>  <!-- Updated to coins --> {% endcomment %}
+                            <input
+                                type="checkbox"
+                                name="selected_subjects"
+                                value="{{ subject.subject_id }}"
+                                class="w-5 h-5 rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500"
+                                {% if subject.subject_id in user_selected_subject_ids %}checked disabled{% endif %}
+                            >
+                            <span class="ml-2 text-sm text-gray-700">
+                                {% if subject.subject_id in user_selected_subject_ids %}Selected{% else %}Select{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-center mt-10">
+                <button
+                    type="submit"
+                    class="bg-gradient-to-r from-blue-600 to-purple-700 text-white px-8 py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-800 transition-all duration-300 transform hover:scale-105">
+                    Select Subjects
+                </button>
+            </div>
+        </form>
+        {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-12">
+            <p class="text-gray-500 text-lg">No subjects available yet</p>
+            {% if user.is_superuser %}
+            <a
+                href="{% url 'create_subject' %}"
+                class="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition duration-300">
+                Create Your First Subject
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

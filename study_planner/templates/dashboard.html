@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Left Column: Study Schedule -->
+    <div class="md:col-span-2 bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-4">Study Schedule</h2>
+        <div class="space-y-4">
+            {% for session in schedule %}
+            <div class="p-4 border-l-4 border-blue-500 bg-gray-50 rounded-lg">
+                <h3 class="text-lg font-semibold">{{ session.course.name }}</h3>
+                <p class="text-sm text-gray-600">
+                    {{ session.start_time|date:"M d, Y H:i" }} - {{ session.end_time|date:"H:i" }}
+                </p>
+                <p class="text-sm text-gray-600">
+                    Difficulty: <span class="font-medium">{{ session.course.difficulty|title }}</span>
+                </p>
+            </div>
+            {% empty %}
+            <p class="text-gray-600">No study sessions scheduled yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Right Column: Progress and Quick Actions -->
+    <div class="space-y-6">
+        <!-- Course Progress -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-4">Course Progress</h2>
+            <div class="space-y-4">
+                {% for prog in progress %}
+                <div>
+                    <h3 class="text-lg font-semibold">{{ prog.course.name }}</h3>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-blue-500 h-2 rounded-full"
+                            style="width: {{ prog.progress_percentage }}%">
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">
+                        {{ prog.hours_studied|floatformat:1 }}h studied / {{ prog.course.total_study_hours }}h total
+                    </p>
+                </div>
+                {% empty %}
+                <p class="text-gray-600">No progress data available.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <!-- Quick Actions -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-bold mb-4">Quick Actions</h2>
+            <div class="space-y-4">
+                <a href="{% url 'study_planner:add_course' %}" class="block p-4 bg-blue-500 text-white text-center rounded-lg hover:bg-blue-600">
+                    Add New Course
+                </a>
+                <a href="{% url 'study_planner:schedule_study_session' %}" class="block p-4 bg-green-500 text-white text-center rounded-lg hover:bg-green-600">
+                    Schedule Study Session
+                </a>
+                <a href="{% url 'study_planner:view_achievements' %}" class="block p-4 bg-purple-500 text-black text-center rounded-lg hover:bg-purple-600">
+                    View Achievements
+                </a>
+                <!-- Add a "Generate Schedule" button -->
+                <form method="post" action="{% url 'study_planner:generate_schedule' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="block w-full p-4 bg-orange-500 text-black text-center rounded-lg hover:bg-orange-600 border-amber-950">
+                        Generate Schedule
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

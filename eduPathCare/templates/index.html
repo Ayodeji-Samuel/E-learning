@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% comment %} {% block content %}
+<div class="bg-blue-50 py-20">
+    <div class="max-w-6xl mx-auto px-4">
+        <div class="text-center">
+            <h1 class="text-5xl font-bold text-blue-950 mb-6">Welcome to AnSaSphere</h1>
+            <p class="text-xl text-gray-700 mb-8">Your Professional Learning and Earning Platform</p>
+            <a href="{% url 'signup' %}" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-300">Get Started</a>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="max-w-6xl mx-auto px-4 py-16">
+    <div class="text-center mb-16">
+        <h2 class="text-3xl font-bold text-blue-950 mb-4">Explore Our Features</h2>
+        <p class="text-gray-700">Discover the tools and resources that will help you succeed in your learning journey.</p>
+    </div>
+
+    <!-- Timeline Section -->
+    <ul class="timeline timeline-snap-icon max-md:timeline-compact timeline-vertical">
+        <!-- Studying for JAMB -->
+        <li>
+            <div class="timeline-middle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="timeline-start mb-10 md:text-end">
+                <time class="font-mono italic">Feature 1</time>
+                <div class="text-lg font-black">Studying for JAMB</div>
+                <img src="https://via.placeholder.com/400x200.png?text=Studying+for+JAMB" alt="Studying for JAMB" class="rounded-lg my-4">
+                <p>Access comprehensive study materials and practice questions tailored for JAMB preparation. Our platform provides detailed explanations and progress tracking to help you excel.</p>
+            </div>
+            <hr />
+        </li>
+
+        <!-- JAMB Exam Prep -->
+        <li>
+            <hr />
+            <div class="timeline-middle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="timeline-end md:mb-10">
+                <time class="font-mono italic">Feature 2</time>
+                <div class="text-lg font-black">JAMB Exam Prep</div>
+                <img src="https://via.placeholder.com/400x200.png?text=JAMB+Exam+Prep" alt="JAMB Exam Prep" class="rounded-lg my-4">
+                <p>Simulate real JAMB exams with timed practice tests and detailed performance analysis. Get instant feedback and improve your scores with our advanced analytics.</p>
+            </div>
+            <hr />
+        </li>
+
+        <!-- Subject-Based Trivia Game -->
+        <li>
+            <hr />
+            <div class="timeline-middle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="timeline-start mb-10 md:text-end">
+                <time class="font-mono italic">Feature 3</time>
+                <div class="text-lg font-black">Subject-Based Trivia Game</div>
+                <img src="https://via.placeholder.com/400x200.png?text=Trivia+Game" alt="Subject-Based Trivia Game" class="rounded-lg my-4">
+                <p>Engage in fun and educational trivia games to test your knowledge across various subjects. Compete with friends and climb the leaderboard while learning.</p>
+            </div>
+            <hr />
+        </li>
+
+        <!-- Voting Polling System -->
+        <li>
+            <hr />
+            <div class="timeline-middle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="timeline-end md:mb-10">
+                <time class="font-mono italic">Feature 4</time>
+                <div class="text-lg font-black">Voting Polling System</div>
+                <img src="https://via.placeholder.com/400x200.png?text=Voting+System" alt="Voting Polling System" class="rounded-lg my-4">
+                <p>Participate in polls and surveys to share your opinions and see what others think. Our voting system is interactive and helps you stay engaged with the community.</p>
+            </div>
+            <hr />
+        </li>
+    </ul>
+</div>
+
+<!-- Call to Action Section -->
+<div class="bg-blue-950 text-white py-16">
+    <div class="max-w-6xl mx-auto px-4">
+        <div class="text-center">
+            <h2 class="text-3xl font-bold mb-4">Ready to Start Learning and Earning?</h2>
+            <p class="text-gray-300 mb-8">Join AnSaSphere today and take the first step towards achieving your learning goals.</p>
+            <a href="{% url 'signup' %}" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-300">Sign Up Now</a>
+        </div>
+    </div>
+</div>
+{% endblock %} {% endcomment %}
+
+{% block content %}
+<div class="bg-blue-50 py-20">
+    <div class="max-w-6xl mx-auto px-4">
+        <div class="text-center">
+            <h1 class="text-5xl font-bold text-blue-950 mb-6">Welcome to AnSaSphere</h1>
+            <p class="text-xl text-gray-700 mb-8">Your Professional Learning and Earning Platform</p>
+            {% if not user.is_authenticated %}  <!-- Hide for authenticated users -->
+                <a href="{% url 'signup' %}" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-300">Get Started</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="max-w-6xl mx-auto px-4 py-16">
+    <div class="text-center mb-16">
+        <h2 class="text-3xl font-bold text-blue-950 mb-4">Explore Our Features</h2>
+        <p class="text-gray-700">Discover the tools and resources that will help you succeed in your learning journey.</p>
+    </div>
+
+    <!-- Timeline Section -->
+    <ul class="timeline timeline-snap-icon max-md:timeline-compact timeline-vertical">
+        <!-- Studying for JAMB -->
+        <li>
+            <div class="timeline-middle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="timeline-start mb-10 md:text-end">
+                <time class="font-mono italic">Feature 1</time>
+                <div class="text-lg font-black">Studying for JAMB</div>
+                <img src="https://via.placeholder.com/400x200.png?text=Studying+for+JAMB" alt="Studying for JAMB" class="rounded-lg my-4">
+                <p>Access comprehensive study materials and practice questions tailored for JAMB preparation. Our platform provides detailed explanations and progress tracking to help you excel.</p>
+            </div>
+            <hr />
+        </li>
+
+        <!-- JAMB Exam Prep -->
+        <li>
+            <hr />
+            <div class="timeline-middle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="timeline-end md:mb-10">
+                <time class="font-mono italic">Feature 2</time>
+                <div class="text-lg font-black">JAMB Exam Prep</div>
+                <img src="https://via.placeholder.com/400x200.png?text=JAMB+Exam+Prep" alt="JAMB Exam Prep" class="rounded-lg my-4">
+                <p>Simulate real JAMB exams with timed practice tests and detailed performance analysis. Get instant feedback and improve your scores with our advanced analytics.</p>
+            </div>
+            <hr />
+        </li>
+
+        <!-- Subject-Based Trivia Game -->
+        <li>
+            <hr />
+            <div class="timeline-middle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="timeline-start mb-10 md:text-end">
+                <time class="font-mono italic">Feature 3</time>
+                <div class="text-lg font-black">Subject-Based Trivia Game</div>
+                <img src="https://via.placeholder.com/400x200.png?text=Trivia+Game" alt="Subject-Based Trivia Game" class="rounded-lg my-4">
+                <p>Engage in fun and educational trivia games to test your knowledge across various subjects. Compete with friends and climb the leaderboard while learning.</p>
+            </div>
+            <hr />
+        </li>
+
+        <!-- Voting Polling System -->
+        <li>
+            <hr />
+            <div class="timeline-middle">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                </svg>
+            </div>
+            <div class="timeline-end md:mb-10">
+                <time class="font-mono italic">Feature 4</time>
+                <div class="text-lg font-black">Voting Polling System</div>
+                <img src="https://via.placeholder.com/400x200.png?text=Voting+System" alt="Voting Polling System" class="rounded-lg my-4">
+                <p>Participate in polls and surveys to share your opinions and see what others think. Our voting system is interactive and helps you stay engaged with the community.</p>
+            </div>
+            <hr />
+        </li>
+    </ul>
+</div>
+
+<!-- Call to Action Section -->
+<div class="bg-blue-950 text-white py-16">
+    <div class="max-w-6xl mx-auto px-4">
+        <div class="text-center">
+            <h2 class="text-3xl font-bold mb-4">Ready to Start Learning and Earning?</h2>
+            <p class="text-gray-300 mb-8">Join AnSaSphere today and take the first step towards achieving your learning goals.</p>
+            {% if not user.is_authenticated %}  <!-- Hide for authenticated users -->
+                <a href="{% url 'signup' %}" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition duration-300">Sign Up Now</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

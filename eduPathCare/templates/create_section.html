@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/createSection.css' %}">
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="form-wrapper">
+                    <!-- Form Header -->
+                    <div class="form-header">
+                        <h1 class="form-title">
+                            {% if section %}
+                                Edit Section
+                            {% else %}
+                                Create New Section
+                            {% endif %}
+                        </h1>
+                        <p class="form-subtitle">{{ subject.subject_name }}</p>
+                    </div>
+
+                    <!-- Form Body -->
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-body">
+                            <!-- Section Name -->
+                            <div class="form-section">
+                                <label for="{{ form.section_name.id_for_label }}" class="form-label">
+                                    <i class="fas fa-heading me-2"></i>Section Name
+                                </label>
+                                {{ form.section_name|attr:"class:form-control" }}
+                            </div>
+
+                            <!-- Section Order -->
+                            <div class="form-section">
+                                <label for="{{ form.section_order.id_for_label }}" class="form-label">
+                                    <i class="fas fa-sort-numeric-down me-2"></i>Section Order
+                                </label>
+                                {{ form.section_order|attr:"class:form-control order-input" }}
+                            </div>
+
+                            <!-- Text Content -->
+                            <div class="form-section">
+                                <label for="{{ form.text_content.id_for_label }}" class="form-label">
+                                    <i class="fas fa-paragraph me-2"></i>Content
+                                </label>
+                                {{ form.text_content|safe }}
+                            </div>
+
+                            <!-- Image Content -->
+                            <div class="form-section">
+                                <label for="{{ form.image_content.id_for_label }}" class="form-label">
+                                    <i class="fas fa-image me-2"></i>Image URL
+                                </label>
+                                {{ form.image_content|attr:"class:form-control" }}
+                                {% if section.image_content %}
+                                    <img src="{{ section.image_content }}" alt="Current image" class="image-preview">
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Form Footer -->
+                        <div class="form-footer">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <a href="{% url 'subject_details' subject.subject_id %}" class="btn btn-back">
+                                    <i class="fas fa-arrow-left me-2"></i>Back to Subject
+                                </a>
+                                <button type="submit" class="btn btn-submit text-white">
+                                    {% if section %}
+                                        <i class="fas fa-save me-2"></i>Update Section
+                                    {% else %}
+                                        <i class="fas fa-plus me-2"></i>Create Section
+                                    {% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#{{ form.text_content.id_for_label }}').summernote({
+            height: 300,
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline', 'clear']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture']],
+                ['view', ['fullscreen', 'codeview', 'help']]
+            ]
+        });
+    });
+</script>
+{% endblock %}

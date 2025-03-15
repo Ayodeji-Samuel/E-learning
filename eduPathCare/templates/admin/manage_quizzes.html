@@ -1,0 +1,109 @@
+<!-- templates/admin/manage_quizzes.html -->
+
+{% extends 'base.html' %}
+
+{% comment %} {% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Manage Quizzes</h1>
+    <a href="{% url 'create_quiz' %}" class="bg-blue-500 text-white px-4 py-2 rounded mb-4 inline-block">Create New Quiz</a>
+    <table class="min-w-full bg-white">
+        <thead>
+            <tr>
+                <th class="py-2 px-4 border-b">User</th>
+                <th class="py-2 px-4 border-b">Subject</th>
+                <th class="py-2 px-4 border-b">Section</th>
+                <th class="py-2 px-4 border-b">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for quiz in quizzes %}
+            <tr>
+                <td class="py-2 px-4 border-b">{{ quiz.user.username }}</td>
+                <td class="py-2 px-4 border-b">{{ quiz.subject.subject_name }}</td>
+                <td class="py-2 px-4 border-b">{{ quiz.section.section_name }}</td>
+                <td class="py-2 px-4 border-b">
+                    <a href="{% url 'edit_quiz' quiz.quiz_id %}" class="text-blue-500">Edit</a>
+                    <a href="{% url 'delete_quiz' quiz.quiz_id %}" class="text-red-500 ml-2">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} {% endcomment %}
+
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8 text-gray-800">Manage Quizzes</h1>
+    <a href="{% url 'create_quiz' %}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded mb-4 inline-block shadow-lg transition duration-300 ease-in-out">Create New Quiz</a>
+    
+    <!-- Search Bar -->
+    <div class="mb-6">
+        <input
+            type="text"
+            id="search-input"
+            placeholder="Search questions..."
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300"
+        />
+    </div>
+
+
+    <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
+        <table class="min-w-full bg-white">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">User</th>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Subject</th>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Section</th>
+                    <th class="py-3 px-4 border-b text-left text-gray-700">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for quiz in quizzes %}
+                <tr class="hover:bg-gray-50 transition duration-200 ease-in-out">
+                    <td class="py-3 px-4 border-b text-gray-700">{{ quiz.user.username }}</td>
+                    <td class="py-3 px-4 border-b text-gray-700">{{ quiz.subject.subject_name }}</td>
+                    <td class="py-3 px-4 border-b text-gray-700">{{ quiz.section.section_name }}</td>
+                    <td class="py-3 px-4 border-b">
+                        <a href="{% url 'edit_quiz' quiz.quiz_id %}" class="text-blue-500 hover:text-blue-600 transition duration-200 ease-in-out">Edit</a>
+                        <a href="{% url 'delete_quiz' quiz.quiz_id %}" class="text-red-500 hover:text-red-600 ml-2 transition duration-200 ease-in-out">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('search-input');
+        const questionRows = document.querySelectorAll('.question-row');
+        const noResultsMessage = document.getElementById('no-results');
+
+        searchInput.addEventListener('input', function () {
+            const searchTerm = this.value.trim().toLowerCase();
+            let hasVisibleRows = false;
+
+            questionRows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                if (rowText.includes(searchTerm)) {
+                    row.classList.remove('hidden');
+                    hasVisibleRows = true;
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+
+            // Show/hide the no results message
+            if (hasVisibleRows) {
+                noResultsMessage.classList.add('hidden');
+            } else {
+                noResultsMessage.classList.remove('hidden');
+            }
+        });
+    });
+</script>
+{% endblock %}

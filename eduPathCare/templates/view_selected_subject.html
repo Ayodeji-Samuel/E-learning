@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% comment %} {% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold mb-6">Select an Option for {{ subject.subject_name }}</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Study Subject Card -->
+        <a href="{% url 'study_subject' subject.subject_id %}" class="block p-6 bg-white shadow-lg rounded-lg hover:bg-gray-100 transition">
+            <h2 class="text-xl font-semibold">📖 Study Subject</h2>
+            <p class="text-gray-600 mt-2">Explore the sections and subsections of this subject.</p>
+        </a>
+
+        <!-- Take Quiz Card -->
+        <!--<a href="{% url 'take_quiz' subject.subject_id %}" class="block p-6 bg-white shadow-lg rounded-lg hover:bg-gray-100 transition">
+            <h2 class="text-xl font-semibold">📝 Take Quiz</h2>
+            <p class="text-gray-600 mt-2">Attempt quizzes section by section for this subject.</p>
+        </a> -->
+
+        <a href="{% url 'sections_list_quiz' subject.subject_id %}" class="block p-6 bg-white shadow-lg rounded-lg hover:bg-gray-100 transition">
+            <h2 class="text-xl font-semibold">📝 Take Quiz</h2>
+            <p class="text-gray-600 mt-2">Attempt quizzes section by section for this subject.</p>
+        </a>
+
+        <!-- Final Exam Card -->
+        <a href="{% url 'final_exam' subject.subject_id %}" class="block p-6 bg-white shadow-lg rounded-lg hover:bg-gray-100 transition">
+            <h2 class="text-xl font-semibold">🎓 Final Exam</h2>
+            <p class="text-gray-600 mt-2">Take a final test covering all topics in this subject.</p>
+        </a>
+    </div>
+</div>
+{% endblock %} {% endcomment %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Explore {{ subject.subject_name }}</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Choose how you want to engage with this subject. Study, test your knowledge, or prepare for exams.
+            </p>
+        </div>
+
+        <!-- Options Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Study Subject Card -->
+            <a href="{% url 'study_subject' subject.subject_id %}" 
+               class="group relative bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+                <div class="p-8">
+                    <div class="w-12 h-12 mb-6 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-3">Study Subject</h2>
+                    <p class="text-gray-600">Explore all sections and subsections with detailed content.</p>
+                </div>
+                <div class="absolute bottom-0 left-0 w-full h-1 bg-blue-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+            </a>
+
+            <!-- Flashcards Card -->
+            <!-- Flashcards Card -->
+            <a href="{% url 'list_section_flashcards' subject.subject_id %}" 
+                class="group relative bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+                <div class="p-8">
+                    <div class="w-12 h-12 mb-6 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-3">Flashcards</h2>
+                    <p class="text-gray-600">Reinforce your learning with interactive flashcards.</p>
+                </div>
+                <div class="absolute bottom-0 left-0 w-full h-1 bg-purple-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+            </a>
+
+            <!-- Take Quiz Card -->
+            <a href="{% url 'sections_list_quiz' subject.subject_id %}" 
+               class="group relative bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+                <div class="p-8">
+                    <div class="w-12 h-12 mb-6 bg-green-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-3">Take Quiz</h2>
+                    <p class="text-gray-600">Test your knowledge with section-by-section quizzes.</p>
+                </div>
+                <div class="absolute bottom-0 left-0 w-full h-1 bg-green-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+            </a>
+
+            <!-- Final Exam Card -->
+            <a href="{% url 'final_exam' subject.subject_id %}" 
+               class="group relative bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+                <div class="p-8">
+                    <div class="w-12 h-12 mb-6 bg-red-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-xl font-semibold text-gray-900 mb-3">Final Exam</h2>
+                    <p class="text-gray-600">Take a comprehensive test covering all topics.</p>
+                </div>
+                <div class="absolute bottom-0 left-0 w-full h-1 bg-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
