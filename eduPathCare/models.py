@@ -44,6 +44,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     coins = models.PositiveIntegerField(default=0)  # Add this line to track coins
+    otp = models.CharField(max_length=6, blank=True, null=True)  # Add OTP field
+    is_verified = models.BooleanField(default=False)  # Add verification status field
     
     objects = UserManager()
     

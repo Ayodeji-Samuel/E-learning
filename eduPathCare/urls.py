@@ -8,12 +8,14 @@ from .views import (
     upload_questions_csv, selected_courses, select_subjects, view_selected_subject, final_exam,
     study_subject, load_section_content, load_quiz_content, sections_list_quiz, mark_as_completed, purchase_coins,
     user_dashboard, withdraw_coins, dashboard_view, flashcard_view, toggle_mastered, list_section_flashcards, text_to_speech,
+    verify_otp_view,
 )
 
 
 urlpatterns = [
     path('', index, name='index'),
     path('signup/', signup_view, name='signup'),
+    path('verify_otp/<int:user_id>/', verify_otp_view, name='verify_otp'),
     path('login/', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
     path('forgot-password/', forgot_password_view, name='forgot_password'),

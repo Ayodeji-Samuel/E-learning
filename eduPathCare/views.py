@@ -60,17 +60,62 @@ def dashboard_view(request):
     return render(request, 'dashboard.html')
 
 
-# Sign Up View
+import random
+from django.core.mail import send_mail
+from django.conf import settings
+
+import logging
+
+logger = logging.getLogger(__name__)
+
 def signup_view(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('subjects_list')
+            user = form.save(commit=False)
+            user.is_verified = False
+            user.save()
+
+            otp = ''.join(random.choices('0123456789', k=6))
+            user.otp = otp
+            user.save()
+
+            try:
+                send_mail(
+                    'Your OTP for AnSaSphere',
+                    f'Your OTP is: {otp}',
+                    settings.EMAIL_HOST_USER,
+                    [user.email],
+                    fail_silently=False,
+                )
+                logger.info(f"OTP sent to {user.email}")
+            except Exception as e:
+                logger.error(f"Failed to send OTP to {user.email}: {e}")
+
+            return redirect('verify_otp', user_id=user.user_id)
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
+
+
+#Verify OTP View
+
+def verify_otp_view(request, user_id):
+    user = User.objects.get(user_id=user_id)
+    
+    if request.method == 'POST':
+        otp_entered = request.POST.get('otp')
+        
+        if otp_entered == user.otp:
+            user.is_verified = True
+            user.otp = None  # Clear the OTP after verification
+            user.save()
+            messages.success(request, 'Email verified successfully! You can now log in.')
+            return redirect('login')
+        else:
+            messages.error(request, 'Invalid OTP. Please try again.')
+    
+    return render(request, 'verify_otp.html', {'user_id': user_id})
 
 
 
@@ -80,16 +125,20 @@ def login_view(request):
         form = AuthenticationForm(data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            login(request, user)
-            # Log the login activity
-            UserActivity.objects.create(user=user, activity_type='login')
-            return redirect('dashboard')
+            if user.is_verified:
+                login(request, user)
+                UserActivity.objects.create(user=user, activity_type='login')
+                return redirect('dashboard')
+            else:
+                messages.error(request, 'Your email is not verified. Please check your email for the OTP.')
         else:
             messages.error(request, 'Invalid username or password')
     else:
         form = AuthenticationForm()
     
     return render(request, 'login.html', {'form': form})
+
+
 
 def logout_view(request):
     if request.user.is_authenticated:
@@ -1036,16 +1085,6 @@ def withdraw_coins(request):
 
 
 from .models import Flashcard
-
-# Add to eduPathCare/views.py
-# @login_required
-# def flashcard_view(request, section_id):
-#     section = get_object_or_404(Section, section_id=section_id)
-#     flashcards = section.flashcards.all()
-#     return render(request, 'flashcard.html', {
-#         'section': section,
-#         'flashcards': flashcards
-#     })
 
 @login_required
 def flashcard_view(request, section_id):

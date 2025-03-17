@@ -21,6 +21,7 @@ class CustomUserAdmin(UserAdmin):
         ('Permissions', {'fields': ('is_staff', 'is_superuser')}),
         ('Timestamps', {'fields': ('created_at', 'updated_at')}),
         ('Coins', {'fields': ('coins',)}),
+        ('verification', {'fields': ('is_verified', 'otp')}),
     )
     add_fieldsets = (
         (None, {
