@@ -300,3 +300,32 @@ class UserActivity(models.Model):
     class Meta:
         verbose_name_plural = "User Activities"
         ordering = ['-timestamp']
+        
+        
+        
+        
+# Add to models.py (after UserActivity model)
+class Payment(models.Model):
+    PAYMENT_STATUS = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payments')
+    coins_purchased = models.PositiveIntegerField()
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2)
+    receipt = models.ImageField(upload_to='payment_receipts/')
+    sender_name = models.CharField(max_length=255)
+    receipt_no = models.CharField(max_length=100)
+    transaction_date = models.DateTimeField(auto_now_add=True)
+    admin_notes = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=10, choices=PAYMENT_STATUS, default='pending')
+    admin = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='processed_payments')
+    processed_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.coins_purchased} coins ({self.status})"
+
+    class Meta:
+        ordering = ['-transaction_date']

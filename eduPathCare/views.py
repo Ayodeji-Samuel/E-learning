@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
 from asgiref.sync import sync_to_async
 from .models import User, Subject, Section, Question, Quiz, UserProgress, UserSubject, Subsection, FinalExam, UserActivity
@@ -959,72 +959,81 @@ def purchase_coins(request):
 
 
 
-from django.conf import settings
-from paystackapi.transaction import Transaction
 
-# @login_required
-# def purchase_coins(request):
-#     if request.method == 'POST':
-#         selected_coins = int(request.POST.get('selected_coins', 0))
-#         if selected_coins in COIN_PACKAGES:
-#             price = COIN_PACKAGES[selected_coins] * 100  # Convert dollars to kobo (Paystack uses kobo)
-#             email = request.user.email  # Paystack requires an email for the transaction
+# Add to views.py
+from .models import Payment
+from .forms import PaymentForm, PaymentStatusForm
 
-#             # Initialize Paystack transaction
-#             try:
-#                 transaction = Transaction.initialize(
-#                     reference=f"coin_purchase_{request.user.user_id}_{selected_coins}",
-#                     amount=price,
-#                     email=email,
-#                     callback_url=f"{request.build_absolute_uri('/paystack/callback/')}",
-#                     metadata={
-#                         'user_id': request.user.user_id,
-#                         'coins': selected_coins,
-#                     }
-#                 )
-#                 # Redirect to Paystack payment page
-#                 return redirect(transaction['data']['authorization_url'])
-#             except Exception as e:
-#                 messages.error(request, f'Payment error: {str(e)}')
-#         else:
-#             messages.error(request, 'Invalid coin package selected.')
-#     return render(request, 'purchase_coins.html', {'coin_packages': COIN_PACKAGES, 'paystack_public_key': settings.PAYSTACK_PUBLIC_KEY})
+@login_required
+def payment_details(request, coins, price):
+    if request.method == 'POST':
+        form = PaymentForm(request.POST, request.FILES)
+        if form.is_valid():
+            payment = form.save(commit=False)
+            payment.user = request.user
+            payment.coins_purchased = coins
+            payment.amount_paid = price
+            payment.save()
+            
+            messages.success(request, 'Your payment details have been submitted for verification.')
+            return redirect('subjects_list')
+    else:
+        form = PaymentForm(initial={'coins_purchased': coins, 'amount_paid': price})
+
+    return render(request, 'payment_details.html', {
+        'form': form,
+        'coins': coins,
+        'price': price
+    })
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def payment_list(request):
+    payments = Payment.objects.all().order_by('-transaction_date')
+    return render(request, 'admin/payment_list.html', {'payments': payments})
+
+@login_required
+@user_passes_test(lambda u: u.is_staff)
+def payment_detail(request, payment_id):
+    payment = get_object_or_404(Payment, id=payment_id)
+    
+    if request.method == 'POST':
+        status_form = PaymentStatusForm(request.POST, instance=payment)
+        if status_form.is_valid():
+            updated_payment = status_form.save(commit=False)
+            updated_payment.admin = request.user
+            updated_payment.processed_at = timezone.now()
+            updated_payment.save()
+            
+            # If payment is approved, add coins to user's account
+            if updated_payment.status == 'approved':
+                user = updated_payment.user
+                user.coins += updated_payment.coins_purchased
+                user.save()
+                
+                # Log the coin purchase activity
+                UserActivity.objects.create(
+                    user=user,
+                    activity_type='coin_purchased',
+                    details={
+                        'coins': updated_payment.coins_purchased,
+                        'amount': str(updated_payment.amount_paid),
+                        'payment_id': updated_payment.id
+                    }
+                )
+            
+            messages.success(request, 'Payment status updated successfully!')
+            return redirect('payment_detail', payment_id=payment_id)
+    else:
+        status_form = PaymentStatusForm(instance=payment)
+    
+    return render(request, 'admin/payment_detail.html', {
+        'payment': payment,
+        'status_form': status_form
+    })
 
 
 
-# @login_required
-# def paystack_callback(request):
-#     reference = request.GET.get('reference')
-#     if not reference:
-#         messages.error(request, 'Invalid payment reference.')
-#         return redirect('purchase_coins')
-
-#     try:
-#         # Verify the transaction with Paystack
-#         transaction = Transaction.verify(reference)
-#         if transaction['data']['status'] == 'success':
-#             # Extract metadata (user_id and coins)
-#             metadata = transaction['data']['metadata']
-#             user_id = metadata['user_id']
-#             coins = metadata['coins']
-
-#             # Add coins to the user's account
-#             user = User.objects.get(user_id=user_id)
-#             user.coins += int(coins)
-#             user.save()
-
-#             messages.success(request, f'Successfully purchased {coins} coins!')
-#             return redirect('subjects_list')
-#         else:
-#             messages.error(request, 'Payment was not successful.')
-#     except Exception as e:
-#         messages.error(request, f'Payment verification error: {str(e)}')
-
-#     return redirect('purchase_coins')
-
-
-
-# eduPathCare/views.py
 
 from trivia_game.models import GameSession
 

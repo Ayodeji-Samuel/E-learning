@@ -2,7 +2,7 @@
 
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, PasswordResetForm
-from .models import User, Subject, Section, Subsection, FinalExam, Quiz
+from .models import User, Subject, Section, Subsection, FinalExam, Quiz, Payment, Question
 from django_summernote.widgets import SummernoteWidget, SummernoteInplaceWidget
 
 # Sign Up Form
@@ -86,7 +86,6 @@ class SectionForm(forms.ModelForm):
         }
 
 
-# eduPathCare/forms.py
 
 class SubsectionForm(forms.ModelForm):
     class Meta:
@@ -100,8 +99,6 @@ class SubsectionForm(forms.ModelForm):
         }
 #============================================================================================
 
-# forms.py
-from .models import Question
 
 class QuizForm(forms.Form):
     def __init__(self, *args, **kwargs):
@@ -144,7 +141,6 @@ class CSVUploadForm(forms.Form):
     csv_file = forms.FileField(label='Select a CSV file')
     
     
-from .models import User
 
 class UserForm(forms.ModelForm):
     class Meta:
@@ -173,4 +169,35 @@ class FinalExamForm(forms.ModelForm):
         widgets = {
             'completed_at': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
             'time_spent': forms.NumberInput(attrs={'class': 'form-control'}),  # Time in seconds
+        }
+        
+        
+
+class PaymentForm(forms.ModelForm):
+    class Meta:
+        model = Payment
+        fields = ['coins_purchased', 'amount_paid', 'receipt', 'sender_name', 'receipt_no']
+        widgets = {
+            'coins_purchased': forms.NumberInput(attrs={'readonly': 'readonly'}),
+            'amount_paid': forms.NumberInput(attrs={'readonly': 'readonly'}),
+            'sender_name': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500'
+            }),
+            'receipt_no': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500'
+            }),
+        }
+
+class PaymentStatusForm(forms.ModelForm):
+    class Meta:
+        model = Payment
+        fields = ['status', 'admin_notes']
+        widgets = {
+            'admin_notes': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500',
+                'rows': 3
+            }),
+            'status': forms.Select(attrs={
+                'class': 'w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500'
+            }),
         }

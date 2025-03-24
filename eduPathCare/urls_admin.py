@@ -8,6 +8,7 @@ from .views_admin import (
     delete_subsection, create_quiz, edit_quiz, delete_quiz, create_final_exam, edit_final_exam, delete_final_exam, create_section, delete_section, edit_section,
     create_question, edit_question, delete_question, view_user_activities,
 )
+from .views import payment_detail, payment_list, payment_details
 from trivia_game.views_admin import create_category, edit_category, delete_category, create_difficulty_level, edit_difficulty_level, delete_difficulty_level, create_coin_reward, edit_coin_reward, delete_coin_reward
 
 urlpatterns = [
@@ -68,4 +69,9 @@ urlpatterns = [
     path('coin-rewards/delete/<int:coin_reward_id>/', delete_coin_reward, name='delete_coin_reward'),
     
     path('admin/view_user_activities/', view_user_activities, name='view_user_activities'),
+    
+    # Payment management URLs
+    path('payments/', payment_list, name='payment_list'),
+    path('payments/<int:payment_id>/', payment_detail, name='payment_detail'),
+    path('payment-details/<int:coins>/<int:price>/', payment_details, name='payment_details'),
 ]

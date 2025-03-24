@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white shadow rounded-lg p-6">
+        <div class="flex justify-between items-start mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Payment Details</h1>
+                <p class="text-sm text-gray-500">Transaction ID: {{ payment.id }}</p>
+            </div>
+            <span class="px-3 py-1 rounded-full text-sm font-medium 
+                {% if payment.status == 'approved' %}bg-green-100 text-green-800
+                {% elif payment.status == 'rejected' %}bg-red-100 text-red-800
+                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                {{ payment.get_status_display }}
+            </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div>
+                <h2 class="text-lg font-medium text-gray-800 mb-4">User Information</h2>
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-sm text-gray-500">Name</p>
+                        <p class="font-medium">{{ payment.user.get_full_name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Email</p>
+                        <p class="font-medium">{{ payment.user.email }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Current Coins</p>
+                        <p class="font-medium">{{ payment.user.coins }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="text-lg font-medium text-gray-800 mb-4">Transaction Details</h2>
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-sm text-gray-500">Coins Purchased</p>
+                        <p class="font-medium">{{ payment.coins_purchased }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Amount Paid</p>
+                        <p class="font-medium">₦{{ payment.amount_paid }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Sender Name</p>
+                        <p class="font-medium">{{ payment.sender_name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Receipt Number</p>
+                        <p class="font-medium">{{ payment.receipt_no }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Transaction Date</p>
+                        <p class="font-medium">{{ payment.transaction_date|date:"M d, Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <h2 class="text-lg font-medium text-gray-800 mb-4">Payment Receipt</h2>
+            <div class="bg-gray-100 p-4 rounded-lg">
+                <img src="{{ payment.receipt.url }}" alt="Payment Receipt" class="max-w-full h-auto mx-auto">
+            </div>
+        </div>
+
+        {% if request.user.is_staff %}
+        <div class="bg-gray-50 p-6 rounded-lg">
+            <h2 class="text-lg font-medium text-gray-800 mb-4">Update Payment Status</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        {{ status_form.status }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Admin Notes</label>
+                        {{ status_form.admin_notes }}
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+                        Update Status
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
