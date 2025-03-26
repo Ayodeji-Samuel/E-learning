@@ -73,36 +73,125 @@ class Subject(models.Model):
         return self.subject_name
 
 
-# UserSubject Model to track subjects selected by users
 class UserSubject(models.Model):
     user_subject_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    subject = models.ForeignKey('Subject', on_delete=models.CASCADE)
     enrolled_at = models.DateTimeField(auto_now_add=True)
-    subscription_expiry = models.DateTimeField()  # Subscription expiry date
-    is_selected = models.BooleanField(default=True)  # New field to track selection
+    subscription_expiry = models.DateTimeField()
+    is_selected = models.BooleanField(default=True)
     is_completed = models.BooleanField(default=False)
-
-    def save(self, *args, **kwargs):
-        # Set subscription expiry to 30 days from enrollment (or any other duration)
-        if not self.subscription_expiry:
-            self.subscription_expiry = timezone.now() + timedelta(days=30)
-        super().save(*args, **kwargs)
-
-    def is_subscription_active(self):
-        # Check if the subscription is still active
-        return timezone.now() < self.subscription_expiry
-    
-    def update_selection_status(self):
-        if self.subscription_expiry and timezone.now() > self.subscription_expiry:
-            self.is_selected = False
-            self.save()
+    is_paid = models.BooleanField(default=False)  # New field to track if this is a paid subscription
+    trial_period_days = models.PositiveIntegerField(
+        default=7,  # Default 7-day trial
+        help_text="Number of days for free trial (0 for no trial)"
+    )
+    last_notification_sent = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When was the last trial expiration notification sent"
+    )
 
     class Meta:
-        unique_together = ('user', 'subject')  # Ensure a user can only select a subject once
+        unique_together = ('user', 'subject')
+        verbose_name = "User Subject"
+        verbose_name_plural = "User Subjects"
 
     def __str__(self):
         return f"{self.user.username} - {self.subject.subject_name}"
+
+    def save(self, *args, **kwargs):
+        # Set subscription expiry if this is a new record or trial period is being set
+        if not self.pk or 'trial_period_days' in kwargs.get('update_fields', []):
+            self.set_subscription_expiry()
+        super().save(*args, **kwargs)
+
+    def set_subscription_expiry(self):
+        """Set the subscription expiry based on trial period"""
+        if self.trial_period_days > 0 and not self.is_paid:
+            self.subscription_expiry = timezone.now() + timedelta(days=self.trial_period_days)
+        elif self.is_paid:
+            # For paid subscriptions, you might want to set a longer period
+            self.subscription_expiry = timezone.now() + timedelta(days=365)  # 1 year
+        else:
+            # No trial, immediate expiry
+            self.subscription_expiry = timezone.now()
+
+    def is_subscription_active(self):
+        """Check if subscription is currently active"""
+        return timezone.now() < self.subscription_expiry
+
+    def days_remaining(self):
+        """Calculate days remaining in trial/subscription"""
+        delta = self.subscription_expiry - timezone.now()
+        return delta.days if delta.days > 0 else 0
+
+    def is_trial(self):
+        """Check if this is a trial subscription"""
+        return not self.is_paid and self.trial_period_days > 0
+
+    def update_selection_status(self):
+        """Update selection status based on subscription expiry"""
+        if not self.is_subscription_active():
+            self.is_selected = False
+            self.save()
+
+    def send_trial_expiration_notification(self):
+        """Send notification about trial expiration"""
+        if self.is_trial() and self.days_remaining() <= 3:
+            # Check if we already sent a notification recently
+            if (self.last_notification_sent is None or 
+                (timezone.now() - self.last_notification_sent).days >= 1):
+                
+                # Send notification (implement your notification system here)
+                from django.core.mail import send_mail
+                subject = f"Your trial for {self.subject.subject_name} is ending soon"
+                message = (
+                    f"Your free trial for {self.subject.subject_name} will expire in {self.days_remaining()} days. "
+                    "Subscribe now to continue learning without interruption."
+                )
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [self.user.email],
+                    fail_silently=True,
+                )
+                
+                # Update notification timestamp
+                self.last_notification_sent = timezone.now()
+                self.save(update_fields=['last_notification_sent'])
+    
+    def renew_trial(self):
+        """Renew an expired trial"""
+        if not self.is_paid and self.trial_period_days > 0:
+            self.enrolled_at = timezone.now()
+            self.subscription_expiry = timezone.now() + timedelta(days=self.trial_period_days)
+            self.is_selected = True
+            self.save()
+            return True
+        return False
+
+    @classmethod
+    def create_trial_subscription(cls, user, subject):
+        """Helper method to create a trial subscription"""
+        return cls.objects.create(
+            user=user,
+            subject=subject,
+            is_paid=False,
+            trial_period_days=7,  # Default 7-day trial
+        )
+
+    @classmethod
+    def create_paid_subscription(cls, user, subject, duration_days=365):
+        """Helper method to create a paid subscription"""
+        return cls.objects.create(
+            user=user,
+            subject=subject,
+            is_paid=True,
+            trial_period_days=0,  # No trial for paid subscriptions
+            subscription_expiry=timezone.now() + timedelta(days=duration_days),
+        )
 
 
 # Sections Model

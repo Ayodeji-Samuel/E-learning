@@ -166,14 +166,22 @@ def forgot_password_view(request):
 @login_required
 def subjects_list_view(request):
     subjects = Subject.objects.all()
-    user_selected_subject_ids = UserSubject.objects.filter(
-        user=request.user, is_selected=True
-    ).values_list('subject_id', flat=True)
+    user_subjects = UserSubject.objects.filter(user=request.user).select_related('subject')
+    
+    # Create a dictionary mapping subject IDs to user subjects for easy lookup
+    user_subject_dict = {us.subject_id: us for us in user_subjects}
+    
+    # Get active trials
+    active_trials = [us for us in user_subjects if us.is_subscription_active()]
+    
     context = {
         'subjects': subjects,
-        'user_selected_subject_ids': user_selected_subject_ids,
+        'user_subject_dict': user_subject_dict,
+        'active_trials': active_trials,
+        'has_active_trials': len(active_trials) > 0,
     }
     return render(request, 'subjectsList.html', context)
+
 
 
 @login_required
@@ -651,36 +659,33 @@ def selected_courses(request):
 #     return redirect('subjects_list')
 
 
+# views.py
+from datetime import timedelta  # Add this with other imports
+from django.utils import timezone
+
+
 @login_required
 def select_subjects(request):
     if request.method == 'POST':
         selected_subject_ids = request.POST.getlist('selected_subjects')
         user = request.user
 
-        # Check if no subjects are selected
         if not selected_subject_ids:
             messages.error(request, 'Please select at least one subject to proceed.')
             return redirect('subjects_list')
 
-        # Process selected subjects
         for subject_id in selected_subject_ids:
-            subject = Subject.objects.get(subject_id=subject_id)
-            # Check if the user has already selected this subject
-            if not UserSubject.objects.filter(user=user, subject=subject, is_selected=True).exists():
-                UserSubject.objects.create(user=user, subject=subject, is_selected=True)
-                # Log the subject selection activity
-                UserActivity.objects.create(
-                    user=user,
-                    activity_type='subject_selected',
-                    details={
-                        'subject_id': subject.subject_id,
-                        'subject_name': subject.subject_name,
-                    }
-                )
+            subject = get_object_or_404(Subject, subject_id=subject_id)
+            user_subject = UserSubject.objects.filter(user=user, subject=subject).first()
 
-        messages.success(request, 'Your subjects have been successfully updated!')
+            if user_subject:
+                if user_subject.renew_trial():
+                    messages.info(request, f'Trial renewed for {subject.subject_name}')
+            else:
+                UserSubject.create_trial_subscription(user=user, subject=subject)
+                messages.success(request, f'Free trial started for {subject.subject_name}')
+
         return redirect('selected_courses')
-
     return redirect('subjects_list')
 
 
