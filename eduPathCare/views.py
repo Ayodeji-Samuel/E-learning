@@ -198,6 +198,8 @@ def section_content_view(request, section_id):
 
 #===================================================================================================
 
+# eduPathCare/views.py
+
 @login_required
 def quiz_view(request, section_id):
     section = get_object_or_404(Section, section_id=section_id)
@@ -531,47 +533,10 @@ def selected_courses(request):
     return render(request, 'selected_courses.html', context)
 
 
-# eduPathCare/views.py
-
-# @login_required
-# def select_subjects(request):
-#     if request.method == 'POST':
-#         selected_subject_ids = request.POST.getlist('selected_subjects')
-#         user = request.user
-
-#         if not selected_subject_ids:
-#             messages.error(request, 'Please select at least one subject to proceed.')
-#             return redirect('subjects_list')
-
-#         total_cost = 0
-
-#         for subject_id in selected_subject_ids:
-#             subject = Subject.objects.get(subject_id=subject_id)
-#             total_cost += subject.price
-
-#         if user.coins >= total_cost:
-#             for subject_id in selected_subject_ids:
-#                 subject = Subject.objects.get(subject_id=subject_id)
-#                 if not UserSubject.objects.filter(user=user, subject=subject, is_selected=True).exists():
-#                     UserSubject.objects.create(user=user, subject=subject, is_selected=True)
-#                     user.coins -= subject.price
-#                     user.save()
-#                     # Log the subject selection activity
-#                     UserActivity.objects.create(user=user, activity_type='subject_selected', details={'subject_id': subject.subject_id, 'subject_name': subject.subject_name})
-#             messages.success(request, 'Your subjects have been successfully updated!')
-#         else:
-#             messages.error(request, 'You do not have enough coins to subscribe to these subjects.')
-#             return redirect('purchase_coins')
-
-#         return redirect('selected_courses')
-
-#     return redirect('subjects_list')
-
 
 # views.py
 from datetime import timedelta  # Add this with other imports
 from django.utils import timezone
-
 
 @login_required
 def select_subjects(request):
@@ -780,19 +745,6 @@ def text_to_speech(request):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 @login_required
 def load_quiz_content(request, section_id):
     section = get_object_or_404(Section, section_id=section_id)
@@ -849,18 +801,18 @@ def mark_as_completed(request):
     
     
 # Define coin packages (coins: price in dollars)
-COIN_PACKAGES = {
-    5: 100,   # 5 coins for $1
-    10: 200,  # 10 coins for $2
-    50: 1000,  # 50 coins for $5
-    100: 2000,  # 100 coins for $10
-}
+
+
+from .models import FAQ, CoinPackage
 
 @login_required
 def purchase_coins(request):
+    
+    coin_packages = CoinPackage.objects.filter(is_active=True).order_by('price')
+    faqs = FAQ.objects.filter(is_active=True)
     if request.method == 'POST':
         selected_coins = int(request.POST.get('selected_coins', 0))
-        if selected_coins in COIN_PACKAGES:
+        if selected_coins in coin_packages:
             # In a real-world scenario, you would integrate with a payment gateway here.
             # For now, we'll just add the coins to the user's account.
             request.user.coins += selected_coins
@@ -869,7 +821,12 @@ def purchase_coins(request):
             return redirect('subjects_list')
         else:
             messages.error(request, 'Invalid coin package selected.')
-    return render(request, 'purchase_coins.html', {'coin_packages': COIN_PACKAGES})
+    context = {
+        'coin_packages': coin_packages,
+        'faqs': faqs,
+    }
+    
+    return render(request, 'purchase_coins.html', context)
 
 
 

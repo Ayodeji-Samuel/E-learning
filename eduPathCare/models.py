@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
 from datetime import timedelta
+from django.conf import settings
 
 # Custom User Manager
 class UserManager(BaseUserManager):
@@ -71,7 +72,6 @@ class Subject(models.Model):
     
     def __str__(self):
         return self.subject_name
-
 
 class UserSubject(models.Model):
     user_subject_id = models.AutoField(primary_key=True)
@@ -192,6 +192,11 @@ class UserSubject(models.Model):
             trial_period_days=0,  # No trial for paid subscriptions
             subscription_expiry=timezone.now() + timedelta(days=duration_days),
         )
+        
+    
+
+
+
 
 
 # Sections Model
@@ -418,3 +423,39 @@ class Payment(models.Model):
 
     class Meta:
         ordering = ['-transaction_date']
+        
+        
+        
+class FAQ(models.Model):
+    question = models.CharField(max_length=255)
+    answer = models.TextField()
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.question
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'FAQ'
+        verbose_name_plural = 'FAQs'
+        
+
+class CoinPackage(models.Model):
+    name = models.CharField(max_length=100)
+    coins = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    is_popular = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['price']
+        verbose_name = 'Coin Package'
+        verbose_name_plural = 'Coin Packages'
+
+    def __str__(self):
+        return f"{self.coins} Coins - ₦{self.price}"

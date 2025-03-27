@@ -1,5 +1,19 @@
 # eduPathCare/urls_admin.py
 
+from django.urls import register_converter
+from decimal import Decimal
+
+class DecimalConverter:
+    regex = r'[\d\.]+'
+
+    def to_python(self, value):
+        return Decimal(value)
+
+    def to_url(self, value):
+        return str(value)
+
+register_converter(DecimalConverter, 'decimal')
+
 from django.urls import path
 from .views_admin import (
     admin_dashboard, manage_users, manage_quizzes, manage_subject, manage_sections, manage_subsection,
@@ -74,4 +88,6 @@ urlpatterns = [
     path('payments/', payment_list, name='payment_list'),
     path('payments/<int:payment_id>/', payment_detail, name='payment_detail'),
     path('payment-details/<int:coins>/<int:price>/', payment_details, name='payment_details'),
+    path('payment-details/<int:coins>/<str:price>/', payment_details, name='payment_details'),
+    path('payment-details/<int:coins>/<decimal:price>/', payment_details, name='payment_details'),
 ]

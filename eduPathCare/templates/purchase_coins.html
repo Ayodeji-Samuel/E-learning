@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% load static %}
 
 {% block content %}
@@ -15,10 +14,10 @@
 
         <!-- Pricing Tiers -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {% for coins, price in coin_packages.items %}
+            {% for package in coin_packages %}
             <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-                <!-- Popular Badge (example for best value package) -->
-                {% if forloop.counter == 2 %}
+                <!-- Popular Badge -->
+                {% if package.is_popular %}
                 <div class="bg-blue-600 text-white text-xs font-bold uppercase tracking-wide text-center py-1">
                     Most Popular
                 </div>
@@ -33,72 +32,59 @@
                     </div>
                     
                     <!-- Package Name -->
-                    <h3 class="text-2xl font-bold text-gray-900 mb-2">{{ coins }} Coins</h3>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">{{ package.name }}</h3>
                     
                     <!-- Price -->
                     <div class="mb-6">
-                        <span class="text-3xl font-extrabold text-blue-600">₦{{ price }}</span>
-                        {% if forloop.counter == 2 %}  <!-- Example discount calculation -->
-                        <span class="text-sm text-gray-500 line-through ml-2">₦{% widthratio price 1 1.2 %}</span>
-                        {% endif %}
+                        <span class="text-3xl font-extrabold text-blue-600">₦{{ package.price }}</span>
                     </div>
                     
                     <!-- Features List -->
-                    {% comment %} <ul class="space-y-3 mb-8 text-left">
+                    <ul class="space-y-3 mb-8 text-left">
+                        {% for feature in package.description.splitlines %}
+                        {% if feature.strip %}
                         <li class="flex items-center">
                             <svg class="h-5 w-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
-                            Unlock {{ coins|add:"2" }} premium subjects
+                            {{ feature }}
                         </li>
-                        <li class="flex items-center">
-                            <svg class="h-5 w-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                            Full access for 30 days
-                        </li>
-                        <li class="flex items-center">
-                            <svg class="h-5 w-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                            Priority support
-                        </li>
-                    </ul> {% endcomment %}
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
                     
                     <!-- CTA Button -->
-                    <a href="{% url 'payment_details' coins=coins price=price %}"
+                    <a href="{% url 'payment_details' coins=package.coins price=package.price %}"
                        class="block w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg shadow-md hover:from-blue-700 hover:to-blue-800 transition duration-300">
                         Get Started
                     </a>
                 </div>
             </div>
+            {% empty %}
+            <div class="col-span-4 text-center py-12">
+                <p class="text-gray-500">No coin packages available at the moment.</p>
+            </div>
             {% endfor %}
         </div>
 
-        <!-- Additional Info Section -->
+        <!-- Additional Info Section with Dynamic FAQs -->
         <div class="mt-16 bg-white rounded-xl shadow-md p-8 max-w-4xl mx-auto">
             <div class="text-center">
                 <h2 class="text-2xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
             </div>
             <div class="space-y-6">
+                {% for faq in faqs %}
                 <div>
-                    <h3 class="text-lg font-medium text-gray-900">How do I use my coins?</h3>
+                    <h3 class="text-lg font-medium text-gray-900">{{ faq.question | safe }}</h3>
                     <p class="mt-2 text-gray-600">
-                        Your coins will be automatically added to your account after purchase. You can use them to subscribe to any premium subject in our catalog.
+                        {{ faq.answer | safe }}
                     </p>
                 </div>
-                <div>
-                    <h3 class="text-lg font-medium text-gray-900">Can I get a refund?</h3>
-                    <p class="mt-2 text-gray-600">
-                        We offer refunds within 14 days of purchase if you haven't used any coins. Please contact our support team for assistance.
-                    </p>
+                {% empty %}
+                <div class="text-center text-gray-500">
+                    <p>No FAQs available at the moment.</p>
                 </div>
-                <div>
-                    <h3 class="text-lg font-medium text-gray-900">Need help deciding?</h3>
-                    <p class="mt-2 text-gray-600">
-                        Our team is available 24/7 to help you choose the right package. <a href="#" class="text-blue-600 hover:text-blue-800">Contact us</a> for personalized recommendations.
-                    </p>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>

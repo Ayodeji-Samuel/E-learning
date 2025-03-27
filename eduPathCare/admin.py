@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import (
-    User, Subject, Section, Question, Quiz, UserProgress, UserSubject, Subsection, Flashcard
+    User, Subject, Section, Question, Quiz, UserProgress, UserSubject, Subsection, Flashcard, FAQ
 )
 
 
@@ -50,3 +50,9 @@ admin.site.register(UserProgress)
 admin.site.register(UserSubject)
 admin.site.register(Subsection)
 admin.site.register(Flashcard)
+
+@admin.register(FAQ)
+class FAQAdmin(admin.ModelAdmin):
+    list_display = ('question', 'is_active', 'created_at')
+    list_filter = ('is_active',)
+    search_fields = ('question', 'answer')
