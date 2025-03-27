@@ -2,75 +2,104 @@
 
 {% load static %}
 
-{% comment %} {% block content %}
-<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-4xl w-full space-y-8">
-        <div>
-            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                Purchase Coins
-            </h2>
-            <p class="mt-2 text-center text-sm text-gray-600">
-                Choose a coin package to subscribe to subjects.
-            </p>
-        </div>
-        <form class="mt-8 space-y-6" method="post">
-            {% csrf_token %}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {% for coins, price in coin_packages.items %}
-                    <div class="bg-white shadow-lg rounded-xl p-6 space-y-4 text-center hover:shadow-xl transition-shadow duration-300">
-                        <!-- Coin Image and Value -->
-                        <div class="flex items-center justify-center space-x-2">
-                            <img src="{% static 'images/coins.png' %}" alt="Coin Icon" class="w-10 h-10"> <!-- Replace with your coin image URL -->
-                            <h3 class="text-xl font-semibold text-gray-800">{{ coins }} Coins</h3>
-                        </div>
-                        
-                        <!-- Price -->
-                        <p class="text-gray-600 text-lg">₦{{ price }}</p>
-
-                        <!-- Buy Now Button -->
-                        <button 
-                            type="submit" 
-                            name="selected_coins" 
-                            value="{{ coins }}"
-                            class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300 glass">
-                            Buy Now
-                        </button>
-                    </div>
-                {% endfor %}
-            </div>
-        </form>
-    </div>
-</div>
-{% endblock %} {% endcomment %}
-
-
 {% block content %}
-<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-4xl w-full space-y-8">
-        <div>
-            <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                Purchase Coins
-            </h2>
-            <p class="mt-2 text-center text-sm text-gray-600">
-                Choose a coin package to subscribe to subjects.
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Upgrade Your Learning Experience</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Purchase coins to unlock premium subjects and features
             </p>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+
+        <!-- Pricing Tiers -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {% for coins, price in coin_packages.items %}
-                <div class="bg-white shadow-lg rounded-xl p-6 space-y-4 text-center hover:shadow-xl transition-shadow duration-300">
-                    <div class="flex items-center justify-center space-x-2">
-                        <img src="{% static 'images/coins.png' %}" alt="Coin Icon" class="w-10 h-10">
-                        <h3 class="text-xl font-semibold text-gray-800">{{ coins }} Coins</h3>
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                <!-- Popular Badge (example for best value package) -->
+                {% if forloop.counter == 2 %}
+                <div class="bg-blue-600 text-white text-xs font-bold uppercase tracking-wide text-center py-1">
+                    Most Popular
+                </div>
+                {% endif %}
+                
+                <div class="p-8 text-center">
+                    <!-- Coin Icon -->
+                    <div class="flex justify-center mb-6">
+                        <div class="bg-blue-100 p-4 rounded-full">
+                            <img src="{% static 'images/coins.png' %}" alt="Coin Icon" class="w-12 h-12">
+                        </div>
                     </div>
                     
-                    <p class="text-gray-600 text-lg">₦{{ price }}</p>
-
+                    <!-- Package Name -->
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">{{ coins }} Coins</h3>
+                    
+                    <!-- Price -->
+                    <div class="mb-6">
+                        <span class="text-3xl font-extrabold text-blue-600">₦{{ price }}</span>
+                        {% if forloop.counter == 2 %}  <!-- Example discount calculation -->
+                        <span class="text-sm text-gray-500 line-through ml-2">₦{% widthratio price 1 1.2 %}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Features List -->
+                    {% comment %} <ul class="space-y-3 mb-8 text-left">
+                        <li class="flex items-center">
+                            <svg class="h-5 w-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Unlock {{ coins|add:"2" }} premium subjects
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="h-5 w-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Full access for 30 days
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="h-5 w-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Priority support
+                        </li>
+                    </ul> {% endcomment %}
+                    
+                    <!-- CTA Button -->
                     <a href="{% url 'payment_details' coins=coins price=price %}"
-                        class="w-full px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition duration-300 glass">
-                        Buy Now
+                       class="block w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg shadow-md hover:from-blue-700 hover:to-blue-800 transition duration-300">
+                        Get Started
                     </a>
                 </div>
+            </div>
             {% endfor %}
+        </div>
+
+        <!-- Additional Info Section -->
+        <div class="mt-16 bg-white rounded-xl shadow-md p-8 max-w-4xl mx-auto">
+            <div class="text-center">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
+            </div>
+            <div class="space-y-6">
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900">How do I use my coins?</h3>
+                    <p class="mt-2 text-gray-600">
+                        Your coins will be automatically added to your account after purchase. You can use them to subscribe to any premium subject in our catalog.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900">Can I get a refund?</h3>
+                    <p class="mt-2 text-gray-600">
+                        We offer refunds within 14 days of purchase if you haven't used any coins. Please contact our support team for assistance.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900">Need help deciding?</h3>
+                    <p class="mt-2 text-gray-600">
+                        Our team is available 24/7 to help you choose the right package. <a href="#" class="text-blue-600 hover:text-blue-800">Contact us</a> for personalized recommendations.
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 </div>

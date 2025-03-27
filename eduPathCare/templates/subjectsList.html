@@ -54,11 +54,19 @@
                                     {% endif %}
                                 </span>
                                 
-                                <!-- Trial Badge for Free Subjects -->
-                                {% if subject.price == 0 %}
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    Free Forever
-                                </span>
+                                <!-- Badges -->
+                                {% if subject.subject_id in user_subject_dict %}
+                                    {% with user_subject=user_subject_dict|get_item:subject.subject_id %}
+                                        {% if user_subject.is_paid %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                            Paid Subscription
+                                        </span>
+                                        {% elif subject.price == 0 %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            Free Forever
+                                        </span>
+                                        {% endif %}
+                                    {% endwith %}
                                 {% endif %}
                             </div>
                             
@@ -67,33 +75,38 @@
                                 {% if subject.subject_id in user_subject_dict %}
                                     {% with user_subject=user_subject_dict|get_item:subject.subject_id %}
                                         {% if user_subject.is_subscription_active %}
-                                            {% if user_subject.subscription_expiry %}
-                                                <span class="text-sm font-medium text-green-600">
-                                                    Active {% if not user_subject.is_paid %}Trial{% endif %}
-                                                    until {{ user_subject.subscription_expiry|date:"M d, Y" }}
-                                                </span>
-                                            {% else %}
-                                                <span class="text-sm font-medium text-green-600">
-                                                    Active {% if not user_subject.is_paid %}Trial{% endif %}
-                                                </span>
-                                            {% endif %}
+                                            <span class="text-sm font-medium text-green-600">
+                                                {% if user_subject.is_paid %}
+                                                    Subscribed until {{ user_subject.subscription_expiry|date:"M d, Y" }}
+                                                {% else %}
+                                                    Trial until {{ user_subject.subscription_expiry|date:"M d, Y" }}
+                                                {% endif %}
+                                            </span>
                                         {% else %}
                                             <span class="text-sm font-medium text-red-600">
-                                                Expired {% if not user_subject.is_paid %}Trial{% endif %}
+                                                {% if user_subject.is_paid %}
+                                                    Subscription expired
+                                                {% else %}
+                                                    Trial expired
+                                                {% endif %}
                                             </span>
                                         {% endif %}
                                     {% endwith %}
                                 {% else %}
-                                    <!-- Show selection checkbox for non-selected subjects -->
                                     <div class="flex items-center">
                                         <input
                                             type="checkbox"
                                             name="selected_subjects"
                                             value="{{ subject.subject_id }}"
                                             class="w-5 h-5 rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500"
+                                            {% if subject.subject_id in user_selected_subject_ids %}disabled{% endif %}
                                         >
                                         <span class="ml-2 text-sm text-gray-700">
+                                            {% if subject.subject_id in user_selected_subject_ids %}
+                                            Selected
+                                            {% else %}
                                             Select for Free Trial
+                                            {% endif %}
                                         </span>
                                     </div>
                                 {% endif %}
@@ -102,11 +115,27 @@
                     </div>
                     
                     <!-- View Details Button -->
-                    <div class="px-6 pb-4">
-                        <a href="{% url 'subject_details' subject_id=subject.subject_id %}" 
+                    {% comment %} <div class="px-6 pb-4">
+                        <a href="{% url 'view_selected_subject' user_subject.subject.subject_id %}" 
                            class="block w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg transition duration-300">
                             View Details
                         </a>
+                    </div> {% endcomment %}
+                    <!-- View Details Button -->
+                    <div class="px-6 pb-4">
+                        {% if subject.subject_id in user_subject_dict %}
+                            {% with user_subject=user_subject_dict|get_item:subject.subject_id %}
+                                <a href="{% url 'view_selected_subject' subject_id=user_subject.subject.subject_id %}" 
+                                class="block w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg transition duration-300">
+                                    View Details
+                                </a>
+                            {% endwith %}
+                        {% else %}
+                            <a href="{% url 'subject_details' subject_id=subject.subject_id %}" 
+                            class="block w-full text-center bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg transition duration-300">
+                                View Details
+                            </a>
+                        {% endif %}
                     </div>
                 </div>
                 {% endfor %}
@@ -117,7 +146,7 @@
                 <button
                     type="submit"
                     class="bg-gradient-to-r from-blue-600 to-purple-700 text-white px-8 py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-800 transition-all duration-300 transform hover:scale-105">
-                    {% if has_active_trials %}
+                    {% if has_active_subscriptions %}
                         Add More Subjects
                     {% else %}
                         Start Free Trial
@@ -126,69 +155,130 @@
             </div>
         </form>
         
-        <!-- Current Trials Section -->
-        {% if active_trials %}
+        <!-- Current Subscriptions Section -->
         <div class="mt-12 bg-white rounded-xl shadow-md p-6">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4">Your Active Trials</h2>
-            <div class="overflow-x-auto">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Your Subscriptions</h2>
+            
+            <!-- Tabs for Trials vs Paid Subscriptions -->
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex space-x-8">
+                    <button @click="activeTab = 'active'" 
+                            :class="{'border-blue-500 text-blue-600': activeTab === 'active', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'active'}"
+                            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Active ({{ active_subscriptions|length }})
+                    </button>
+                    <button @click="activeTab = 'expired'" 
+                            :class="{'border-blue-500 text-blue-600': activeTab === 'expired', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'expired'}"
+                            class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                        Expired ({{ expired_subscriptions|length }})
+                    </button>
+                </nav>
+            </div>
+            
+            <!-- Active Subscriptions -->
+            <div x-show="activeTab === 'active'" class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expires In</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        {% for trial in active_trials %}
+                        {% for sub in active_subscriptions %}
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="text-sm font-medium text-gray-900">{{ trial.subject.subject_name }}</div>
+                                    <div class="text-sm font-medium text-gray-900">{{ sub.subject.subject_name }}</div>
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                    Active Trial
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    {% if sub.is_paid %}bg-purple-100 text-purple-800">Paid
+                                    {% else %}bg-blue-100 text-blue-800">Trial
+                                    {% endif %}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ trial.days_remaining }} days remaining
+                                {{ sub.days_remaining }} days ({{ sub.subscription_expiry|date:"M d, Y" }})
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <a href="{% url 'study_subject' subject_id=trial.subject.subject_id %}" class="text-blue-600 hover:text-blue-900">Study Now</a>
+                                <a href="{% url 'study_subject' subject_id=sub.subject.subject_id %}" 
+                                   class="text-blue-600 hover:text-blue-900 mr-4">Study </a> |
+                                {% if not sub.is_paid %}
+                                <a href="{% url 'purchase_coins' %}?subject_id={{ sub.subject.subject_id }}" 
+                                   class="text-green-600 hover:text-green-900">Upgrade</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                                No active subscriptions
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
+            
+            <!-- Expired Subscriptions -->
+            <div x-show="activeTab === 'expired'" class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <!-- Same table structure as above -->
+                    {% for sub in expired_subscriptions %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="text-sm font-medium text-gray-900">{{ sub.subject.subject_name }}</div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                {% if sub.is_paid %}bg-purple-100 text-purple-800">Paid
+                                {% else %}bg-blue-100 text-blue-800">Trial
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            Expired on {{ sub.subscription_expiry|date:"M d, Y" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            {% if sub.is_paid %}
+                            <a href="{% url 'purchase_coins' %}?subject_id={{ sub.subject.subject_id }}" 
+                               class="text-green-600 hover:text-green-900">Renew</a>
+                            {% else %}
+                            <a href="{% url 'select_subjects' %}" 
+                               class="text-blue-600 hover:text-blue-900">Restart Trial</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                            No expired subscriptions
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
         </div>
-        {% endif %}
         
         {% else %}
-        <!-- Empty State -->
-        <div class="text-center py-12">
-            <div class="mx-auto h-24 w-24 text-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                </svg>
-            </div>
-            <h3 class="mt-2 text-lg font-medium text-gray-900">No subjects available</h3>
-            <p class="mt-1 text-sm text-gray-500">We're working on adding more subjects soon.</p>
-            {% if user.is_superuser %}
-            <div class="mt-6">
-                <a href="{% url 'create_subject' %}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                    <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path>
-                    </svg>
-                    Create New Subject
-                </a>
-            </div>
-            {% endif %}
-        </div>
+        <!-- Empty State (same as before) -->
         {% endif %}
     </div>
 </div>
+
+<!-- AlpineJS for tab functionality -->
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('subscriptionTabs', () => ({
+            activeTab: 'active'
+        }))
+    })
+</script>
 {% endblock %}

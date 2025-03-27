@@ -162,23 +162,22 @@ def forgot_password_view(request):
     return render(request, 'passwordReset.html', {'form': form})
 
 
-
 @login_required
 def subjects_list_view(request):
     subjects = Subject.objects.all()
     user_subjects = UserSubject.objects.filter(user=request.user).select_related('subject')
     
-    # Create a dictionary mapping subject IDs to user subjects for easy lookup
+    # Create dictionaries for different subscription states
     user_subject_dict = {us.subject_id: us for us in user_subjects}
-    
-    # Get active trials
-    active_trials = [us for us in user_subjects if us.is_subscription_active()]
+    active_subscriptions = [us for us in user_subjects if us.is_subscription_active()]
+    expired_subscriptions = [us for us in user_subjects if not us.is_subscription_active()]
     
     context = {
         'subjects': subjects,
         'user_subject_dict': user_subject_dict,
-        'active_trials': active_trials,
-        'has_active_trials': len(active_trials) > 0,
+        'active_subscriptions': active_subscriptions,
+        'expired_subscriptions': expired_subscriptions,
+        'has_active_subscriptions': len(active_subscriptions) > 0,
     }
     return render(request, 'subjectsList.html', context)
 
@@ -198,96 +197,6 @@ def section_content_view(request, section_id):
     return render(request, 'sectionContent.html', {'section': section, 'sections': sections})
 
 #===================================================================================================
-
-# views.py
-# @login_required
-# def quiz_view(request, section_id):
-#     section = get_object_or_404(Section, section_id=section_id)
-#     questions = Question.objects.filter(section=section)
-    
-#     if not questions.exists():
-#         messages.warning(request, "This section has no questions yet.")
-#         return redirect('sections_list_quiz', subject_id=section.subject.subject_id)
-
-#     if request.method == 'POST':
-#         form = QuizForm(request.POST, questions=questions)
-#         if form.is_valid():
-#             score = 0
-#             results = []
-            
-#             for question in questions:
-#                 user_answer = form.cleaned_data.get(f'question_{question.question_id}')
-#                 is_correct = user_answer == question.correct_option
-#                 if is_correct:
-#                     score += 1
-#                 results.append({
-#                     'question': question.question_text,
-#                     'user_answer': user_answer,
-#                     'correct_answer': question.correct_option,
-#                     'is_correct': is_correct,
-#                     'explanation': question.get_explanation(user_answer),
-#                 })
-
-#             time_spent = int(request.POST.get('time_spent', 1800))
-#             minutes = time_spent // 60
-#             seconds = time_spent % 60
-
-#             # Get the subject from the section
-#             subject = section.subject
-
-#             # Check if a quiz record already exists
-#             quiz, created = Quiz.objects.get_or_create(
-#                 user=request.user,
-#                 section=section,
-#                 defaults={
-#                     'subject': subject,  # Add the subject here
-#                     'total_score': score,
-#                     'attempts_count': 1,
-#                     'completed_at': timezone.now(),
-#                     'time_spent': time_spent
-#                 }
-#             )
-
-#             # If the quiz already exists, update it
-#             if not created:
-#                 quiz.total_score = score
-#                 quiz.attempts_count += 1
-#                 quiz.completed_at = timezone.now()
-#                 quiz.time_spent = time_spent
-#                 quiz.save()
-
-#             # Update user progress
-#             user_progress, created = UserProgress.objects.get_or_create(
-#                 user=request.user,
-#                 subject=subject,  # Use the subject here
-#                 defaults={'completed_sections': [], 'total_score': 0}
-#             )
-            
-#             if (score / len(questions)) * 100 >= 70:
-#                 if section.section_id not in user_progress.completed_sections:
-#                     user_progress.completed_sections.append(section.section_id)
-#                     user_progress.total_score += score
-#                     user_progress.save()
-
-#             return render(request, 'quiz_results.html', {
-#                 'section': section,
-#                 'results': results,
-#                 'score': score,
-#                 'total_questions': len(questions),
-#                 'percentage_score': round((score / len(questions)) * 100, 2),
-#                 'time_spent_minutes': minutes,
-#                 'time_spent_seconds': seconds,
-#             })
-
-#     return render(request, 'quiz.html', {
-#         'section': section,
-#         'form': QuizForm(questions=questions)
-#     })
-
-
-
-
-# eduPathCare/views.py
 
 @login_required
 def quiz_view(request, section_id):

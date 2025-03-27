@@ -1,34 +1,95 @@
 {% extends 'base.html' %}
 
 
-
 {% block content %}
-<div class="container mx-auto p-6">
-    <h1 class="text-4xl text-red-500 text-center p-3">Your Selected Courses</h1>
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">Your Learning Dashboard</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Track your progress and access your subscribed courses
+            </p>
+        </div>
 
-    {% if user_subjects %}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Courses Grid -->
+        {% if user_subjects %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {% for user_subject in user_subjects %}
                 {% if user_subject.is_selected %}
-                    <div class="bg-white shadow-lg rounded-xl p-6 space-y-4 border border-gray-200">
-                        <h2 class="text-xl font-semibold text-gray-900">{{ user_subject.subject.subject_name }}</h2>
-                        <p class="text-gray-600">{{ user_subject.subject.description | safe }}</p>
-                        <p class="text-sm text-gray-500">📅 Subscription Expiry: {{ user_subject.subscription_expiry }}</p>
-
+                <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 transform hover:-translate-y-1">
+                    <!-- Course Image Placeholder -->
+                    <div class="h-48 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center">
+                        <span class="text-white text-4xl font-bold">{{ user_subject.subject.subject_name|first }}</span>
+                    </div>
+                    
+                    <!-- Course Content -->
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h2 class="text-xl font-bold text-gray-900">{{ user_subject.subject.subject_name }}</h2>
+                            <!-- Status Badge -->
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium 
+                                {% if user_subject.subscription_expiry > current_time %}
+                                    bg-green-100 text-green-800
+                                {% else %}
+                                    bg-red-100 text-red-800
+                                {% endif %}">
+                                {% if user_subject.subscription_expiry > current_time %}
+                                    Active
+                                {% else %}
+                                    Expired
+                                {% endif %}
+                            </span>
+                        </div>
+                        
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                            {{ user_subject.subject.description|safe }}
+                        </p>
+                        
+                        <div class="flex items-center text-sm text-gray-500 mb-4">
+                            <svg class="flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            Expires: {{ user_subject.subscription_expiry|date:"M d, Y" }}
+                        </div>
+                        
+                        <!-- Action Button -->
                         {% if user_subject.subscription_expiry > current_time %}
-                            <a href="{% url 'view_selected_subject' user_subject.subject.subject_id %}" 
-                               class="block text-center bg-green-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-green-700 transition glass">
-                                View Course
-                            </a>
+                        <a href="{% url 'view_selected_subject' user_subject.subject.subject_id %}" 
+                           class="block w-full text-center bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-blue-800 transition duration-300">
+                            Continue Learning
+                        </a>
                         {% else %}
-                            <p class="text-red-500 font-medium text-center">Subscription expired. Course not accessible.</p>
+                        <div class="space-y-3">
+                            <p class="text-red-500 text-sm text-center font-medium">
+                                Renew your subscription to continue learning
+                            </p>
+                            <a href="{% url 'purchase_coins' %}" 
+                               class="block w-full text-center bg-gradient-to-r from-purple-600 to-purple-700 text-white px-4 py-3 rounded-lg font-medium hover:from-purple-700 hover:to-purple-800 transition duration-300">
+                                Upgrade Now
+                            </a>
+                        </div>
                         {% endif %}
                     </div>
+                </div>
                 {% endif %}
             {% endfor %}
         </div>
-    {% else %}
-        <p class="text-center text-gray-500 text-lg">You have not selected any courses yet.</p>
-    {% endif %}
+        {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-16 bg-white rounded-xl shadow-sm max-w-2xl mx-auto">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            <h3 class="mt-2 text-lg font-medium text-gray-900">No courses selected</h3>
+            <p class="mt-1 text-sm text-gray-500">Get started by selecting courses from our catalog.</p>
+            <div class="mt-6">
+                <a href="{% url 'subjects_list' %}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Browse Courses
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
